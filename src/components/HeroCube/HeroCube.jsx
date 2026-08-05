@@ -207,13 +207,13 @@ function WireframePulse({ animRef }) {
 }
 
 /* ─── central cube (stays at center during all phases) ───────── */
-function CentralCube({ isDark }) {
+function CentralCube({ isDark, color = isDark ? 0xffffff : 0x2ec4b6 }) {
   const ref = useRef();
 
   const mat = useMemo(
     () =>
       new THREE.MeshPhysicalMaterial({
-        color: new THREE.Color(isDark ? 0xffffff : 0x2ec4b6),
+        color: new THREE.Color(color),
         metalness: 0.05,
         roughness: 0.32,
         clearcoat: 0.4,
@@ -221,7 +221,7 @@ function CentralCube({ isDark }) {
         emissive: new THREE.Color(0x000000),
         emissiveIntensity: 0,
       }),
-    [isDark]
+    [color]
   );
 
   return (
@@ -441,7 +441,7 @@ function Scene({ onAnimUpdate }) {
 
 <Float speed={1.2} rotationIntensity={0.15} floatIntensity={0.2}>
             <group ref={groupRef}>
-              <CentralCube isDark={isDark} />
+              <CentralCube isDark={isDark} color={0xff0000} />
               {REST.map((pos, i) => (
             <FeatureCube
               key={i}
