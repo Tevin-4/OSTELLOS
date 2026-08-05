@@ -1,0 +1,417 @@
+import React, { useRef, useMemo, useState, useEffect } from 'react';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { Float, Html } from '@react-three/drei';
+import { EffectComposer, Bloom } from '@react-three/postprocessing';
+import * as THREE from 'three';
+import { FEATURES, CUBE_SIZE, STEP, SPLIT_MULT } from './FeatureConfig';
+import './HeroCube.css';
+
+/* ─── 2×2×2 grid positions, centered ────────────────────── */
+function makePositions() {
+  const pos = [];
+  for (let x = -1; x <= 1; x += 2)
+    for (let y = -1; y <= 1; y += 2)
+      for (let z = -1; z <= 1; z += 2)
+        pos.push([x * STEP, y * STEP, z * STEP]);
+  return pos;
+}
+const REST = makePositions();
+const SPLIT = REST.map((p) => p.map((v) => v * SPLIT_MULT));
+
+/* ─── single feature cube ───────────────────────────────── */
+function FeatureCube({ index, restPos, splitPos, accent, title, icon, phase, phaseProgress }) {
+  const meshRef = useRef();
+  const glowRef = useRef();
+  const [showLabel, setShowLabel] = useState(false);
+  const [hovered, setHovered] = useState(false);
+
+  const baseMat = useMemo(
+    () =>
+      new THREE.MeshPhysicalMaterial({
+        color: new THREE.Color('#ffffff'),
+        metalness: 0.05,
+        roughness: 0.32,
+        clearcoat: 0.4,
+        clearcoatRoughness: 0.2,
+        emissive: new THREE.Color(0x000000),
+        emissiveIntensity: 0,
+        transparent: true,
+        opacity: 1,
+      }),
+    []
+  );
+
+  const glowMat = useMemo(
+    () =>
+      new THREE.MeshBasicMaterial({
+        color: new THREE.Color(accent),
+        transparent: true,
+        opacity: 0,
+        side: THREE.BackSide,
+      }),
+    [accent]
+  );
+
+  useFrame(() => {
+    if (!meshRef.current) return;
+    const m = meshRef.current;
+    const isActive = phase === 'highlight' && phaseProgress.highlightIndex === index;
+    const isSplit = phase === 'split' || phase === 'highlight' || phase === 'pre-merge';
+    const isDimmed = phase === 'highlight' && phaseProgress.highlightIndex >= 0 && !isActive;
+
+    // target position
+    let tx, ty, tz;
+    if (isActive) {
+      tx = splitPos[0];
+      ty = splitPos[1];
+      tz = splitPos[2] + 0.4;
+    } else if (isSplit) {
+      tx = splitPos[0];
+      ty = splitPos[1];
+      tz = splitPos[2];
+    } else {
+      tx = restPos[0];
+      ty = restPos[1];
+      tz = restPos[2];
+    }
+
+    // lerp position
+    const lerp = 0.08;
+    m.position.x += (tx - m.position.x) * lerp;
+    m.position.y += (ty - m.position.y) * lerp;
+    m.position.z += (tz - m.position.z) * lerp;
+
+    // scale
+    const ts = isActive ? 1.15 : hovered ? 1.1 : 1;
+    m.scale.x += (ts - m.scale.x) * lerp;
+    m.scale.y += (ts - m.scale.y) * lerp;
+    m.scale.z += (ts - m.scale.z) * lerp;
+
+    // rotation
+    const ry = isActive ? 0.18 : 0;
+    m.rotation.y += (ry - m.rotation.y) * lerp;
+
+    // material — theme-aware base color
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    const baseColor = isDark ? 0xffffff : 0x2ec4b6;
+    const emphasized = isActive || hovered;
+
+    // when cubes are merged into one solid cube, render opaque so internal
+    // faces are hidden by depth-testing (no visible seams). when split, keep
+    // transparent for the dimming effect.
+    const assembled = phase === 'intro' || phase === 'merge' || phase === 'outro' || phase === 'pause' || phase === 'idle';
+    baseMat.transparent = !assembled;
+    if (assembled) baseMat.opacity = 1;
+
+    if (emphasized) {
+      baseMat.color.setHex(baseColor);
+      baseMat.emissive.setHex(baseColor);
+      baseMat.emissiveIntensity += (0.2 - baseMat.emissiveIntensity) * 0.1;
+      baseMat.opacity += (1 - baseMat.opacity) * 0.1;
+    } else if (isDimmed) {
+      baseMat.color.setHex(baseColor);
+      baseMat.emissiveIntensity += (0 - baseMat.emissiveIntensity) * 0.1;
+      baseMat.opacity += (0.55 - baseMat.opacity) * 0.1;
+    } else {
+      baseMat.color.setHex(baseColor);
+      baseMat.emissiveIntensity += (0 - baseMat.emissiveIntensity) * 0.1;
+      baseMat.opacity += (1 - baseMat.opacity) * 0.1;
+    }
+
+    // glow
+    glowMat.opacity += (((isActive || hovered) ? 0.14 : 0) - glowMat.opacity) * 0.1;
+
+    // label
+    const wantLabel = isActive || hovered;
+    if (wantLabel && !showLabel) setShowLabel(true);
+    if (!wantLabel && showLabel) setShowLabel(false);
+  });
+
+  return (
+    <group>
+      <mesh
+        ref={meshRef}
+        position={restPos}
+        material={baseMat}
+        onPointerOver={(e) => {
+          e.stopPropagation();
+          setHovered(true);
+        }}
+        onPointerOut={(e) => {
+          e.stopPropagation();
+          setHovered(false);
+        }}
+      >
+        <boxGeometry args={[CUBE_SIZE, CUBE_SIZE, CUBE_SIZE]} />
+        {showLabel && (
+          <Html position={[CUBE_SIZE * 2.2, CUBE_SIZE * 0.5, 0]} center distanceFactor={6} style={{ pointerEvents: 'none' }}>
+            <div className="r3f-label">
+              <i className={`ph ph-${icon}`}></i>
+              <span>{title}</span>
+            </div>
+          </Html>
+        )}
+      </mesh>
+      <mesh ref={glowRef} position={restPos} material={glowMat} scale={1.18}>
+        <boxGeometry args={[CUBE_SIZE, CUBE_SIZE, CUBE_SIZE]} />
+      </mesh>
+    </group>
+  );
+}
+
+/* ─── connecting lines ──────────────────────────────────── */
+function ConnectLines({ phase }) {
+  const matRef = useRef();
+
+  const geo = useMemo(() => {
+    const pts = [];
+    REST.forEach((p) =>
+      pts.push(new THREE.Vector3(0, 0, 0), new THREE.Vector3(p[0], p[1], p[2]))
+    );
+    return new THREE.BufferGeometry().setFromPoints(pts);
+  }, []);
+
+  useFrame(() => {
+    if (!matRef.current) return;
+    const target = phase === 'highlight' || phase === 'split' ? 0.2 : 0;
+    matRef.current.opacity += (target - matRef.current.opacity) * 0.08;
+  });
+
+  return (
+    <line geometry={geo}>
+      <lineBasicMaterial ref={matRef} color="#94a3b8" transparent opacity={0} />
+    </line>
+  );
+}
+
+/* ─── wireframe pulse ───────────────────────────────────── */
+function WireframePulse({ phase }) {
+  const ref = useRef();
+  const totalSize = (STEP * 2 + CUBE_SIZE) * 1.06;
+
+  useFrame(() => {
+    if (!ref.current) return;
+    const show = phase === 'outro' || phase === 'merge';
+    const target = show ? 0.35 : 0;
+    ref.current.material.opacity += (target - ref.current.material.opacity) * 0.1;
+    if (show) {
+      const s = 1.02 + Math.sin(Date.now() * 0.008) * 0.01;
+      ref.current.scale.setScalar(s);
+    } else {
+      ref.current.scale.setScalar(1);
+    }
+  });
+
+  return (
+    <mesh ref={ref}>
+      <boxGeometry args={[totalSize, totalSize, totalSize]} />
+      <meshBasicMaterial color="#2ec4b6" wireframe transparent opacity={0} />
+    </mesh>
+  );
+}
+
+/* ─── solid shell cube (covers sub-cubes when assembled) ── */
+function SolidShell({ phase }) {
+  const ref = useRef();
+  const shellSize = CUBE_SIZE * 2 * 1.02;
+
+  const mat = useMemo(
+    () =>
+      new THREE.MeshPhysicalMaterial({
+        color: new THREE.Color('#ffffff'),
+        metalness: 0.05,
+        roughness: 0.32,
+        clearcoat: 0.4,
+        clearcoatRoughness: 0.2,
+        emissive: new THREE.Color(0x000000),
+        emissiveIntensity: 0,
+        transparent: false,
+        opacity: 1,
+      }),
+    []
+  );
+
+  useFrame(() => {
+    if (!ref.current) return;
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    const baseColor = isDark ? 0xffffff : 0x2ec4b6;
+    mat.color.setHex(baseColor);
+  });
+
+  return (
+    <mesh ref={ref} material={mat}>
+      <boxGeometry args={[shellSize, shellSize, shellSize]} />
+    </mesh>
+  );
+}
+
+/* ─── animation state machine ───────────────────────────── */
+function useAnimationMachine(headlineLeftRef, headlineRightRef) {
+  const [state, setState] = useState({
+    phase: 'idle',
+    highlightIndex: -1,
+    groupY: 0,
+    headlineOpacity: 1,
+  });
+  const timerRef = useRef(0);
+  const stepRef = useRef(0);
+
+  const PHASES = [
+    { name: 'intro',        duration: 2800 },
+    { name: 'split',        duration: 900  },
+    { name: 'highlight',    duration: 750 * 8, perCube: 750 },
+    { name: 'pre-merge',    duration: 400  },
+    { name: 'merge',        duration: 900  },
+    { name: 'outro',        duration: 2800 },
+    { name: 'pause',        duration: 1200 },
+  ];
+
+  useFrame((_, delta) => {
+    timerRef.current += delta * 1000;
+
+    const phaseDef = PHASES[stepRef.current % PHASES.length];
+    const phaseName = phaseDef.name;
+
+    if (timerRef.current >= phaseDef.duration) {
+      timerRef.current = 0;
+      stepRef.current++;
+      const next = PHASES[stepRef.current % PHASES.length];
+
+      if (next.name === 'intro') {
+        if (headlineLeftRef?.current) headlineLeftRef.current.style.opacity = '1';
+        if (headlineRightRef?.current) headlineRightRef.current.style.opacity = '0';
+        setState((s) => ({ ...s, phase: 'idle', highlightIndex: -1, groupY: 0 }));
+      } else if (next.name === 'split') {
+        if (headlineLeftRef?.current) headlineLeftRef.current.style.opacity = '0';
+        setState((s) => ({ ...s, phase: 'split', groupY: 0.15 }));
+      } else if (next.name === 'highlight') {
+        setState((s) => ({ ...s, phase: 'highlight', highlightIndex: 0 }));
+      } else if (next.name === 'pre-merge') {
+        setState((s) => ({ ...s, phase: 'pre-merge', highlightIndex: -1 }));
+      } else if (next.name === 'merge') {
+        setState((s) => ({ ...s, phase: 'merge', groupY: 0 }));
+      } else if (next.name === 'outro') {
+        if (headlineRightRef?.current) headlineRightRef.current.style.opacity = '1';
+        setState((s) => ({ ...s, phase: 'pulse' }));
+      } else if (next.name === 'pause') {
+        if (headlineRightRef?.current) headlineRightRef.current.style.opacity = '0';
+        setState((s) => ({ ...s, phase: 'pause' }));
+      }
+    }
+
+    // within highlight phase, advance index
+    if (phaseName === 'highlight') {
+      const idx = Math.floor(timerRef.current / phaseDef.perCube);
+      if (idx !== state.highlightIndex && idx < 8) {
+        setState((s) => ({ ...s, highlightIndex: idx }));
+      }
+    }
+
+    // smooth group Y
+    setState((s) => {
+      const target = s.groupY;
+      // groupY is already the target, actual position is handled in the group
+      return s;
+    });
+  });
+
+  return state;
+}
+
+/* ─── scene internals ───────────────────────────────────── */
+function Scene({ headlineLeftRef, headlineRightRef }) {
+  const groupRef = useRef();
+  const { camera } = useThree();
+  const anim = useAnimationMachine(headlineLeftRef, headlineRightRef);
+
+  const GROUP_Y_OFFSET = 0.35;
+  const GROUP_X_OFFSET = 0.6;
+
+  useEffect(() => {
+    camera.position.set(5.5, 3.8, 5);
+    camera.lookAt(0.6, 0.15, 0);
+  }, [camera]);
+
+  /* mouse parallax + group Y position */
+  useFrame(({ pointer }) => {
+    if (!groupRef.current) return;
+
+    // parallax — strong follow
+    const targetRY = 0.35 + pointer.x * 0.5;
+    const targetRX = 0.12 + pointer.y * 0.4;
+    groupRef.current.rotation.y += (targetRY - groupRef.current.rotation.y) * 0.12;
+    groupRef.current.rotation.x += (targetRX - groupRef.current.rotation.x) * 0.12;
+
+    // group Y — base offset plus animation target
+    const targetY = GROUP_Y_OFFSET + anim.groupY;
+    groupRef.current.position.y += (targetY - groupRef.current.position.y) * 0.06;
+    // group X — slight right offset
+    groupRef.current.position.x += (GROUP_X_OFFSET - groupRef.current.position.x) * 0.04;
+  });
+
+  return (
+    <>
+      <ambientLight intensity={0.7} />
+      <hemisphereLight args={['#ffffff', '#3a4a3a', 0.3]} />
+      <directionalLight
+        position={[5, 8, 5]}
+        intensity={1.4}
+      />
+      <directionalLight position={[-4, 2, -3]} intensity={0.35} color="#88ccff" />
+
+      <Float speed={1.2} rotationIntensity={0.15} floatIntensity={0.2}>
+        <group ref={groupRef}>
+          {REST.map((pos, i) => (
+            <FeatureCube
+              key={i}
+              index={i}
+              restPos={pos}
+              splitPos={SPLIT[i]}
+              accent={FEATURES[i].color}
+              title={FEATURES[i].title}
+              icon={FEATURES[i].icon}
+              phase={anim.phase}
+              phaseProgress={{ highlightIndex: anim.highlightIndex }}
+            />
+          ))}
+          <ConnectLines phase={anim.phase} />
+          <WireframePulse phase={anim.phase} />
+          <SolidShell phase={anim.phase} />
+        </group>
+      </Float>
+
+      <EffectComposer>
+        <Bloom luminanceThreshold={0.6} luminanceSmoothing={0.9} intensity={0.5} />
+      </EffectComposer>
+    </>
+  );
+}
+
+/* ─── exported component ────────────────────────────────── */
+export default function HeroCube() {
+  const headlineLeftRef = useRef(null);
+  const headlineRightRef = useRef(null);
+
+  return (
+    <div className="hero-cube-wrap">
+      <Canvas
+        dpr={[1, 1.5]}
+        gl={{ antialias: true, alpha: true }}
+        camera={{ fov: 35, near: 0.1, far: 100 }}
+        style={{ background: 'transparent' }}
+      >
+        <Scene headlineLeftRef={headlineLeftRef} headlineRightRef={headlineRightRef} />
+      </Canvas>
+      <div className="cube-overlay cube-overlay--left">
+        <h2 className="cube-headline" ref={headlineLeftRef} style={{ opacity: 1 }}>
+          Explore our platform
+        </h2>
+      </div>
+      <div className="cube-overlay cube-overlay--right">
+        <h2 className="cube-headline" ref={headlineRightRef} style={{ opacity: 0 }}>
+          Everything in one place
+        </h2>
+      </div>
+    </div>
+  );
+}

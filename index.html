@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ostellos MS — Hostel Management System</title>
+  <meta name="description" content="One smart system to run rooms, bookings, payments, maintenance, and visitors across your hostels. Self-hosted, secure, built for modern hospitality.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+  <link rel="stylesheet" href="src/styles.css">
+  <link rel="stylesheet" href="src/styles-dark.css" id="dark-theme-link" disabled>
+  <script type="module" src="src/main.jsx"></script>
+  
+  <link rel="preload" as="image" href="logo.png" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230B1120'/%3E%3Cpath d='M8 25 V14 l8-7 8 7 v11' fill='none' stroke='%2300BFA6' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <!-- ── Nav ─────────────────────────────────────────────────────────────── -->
+  <header class="nav" id="top">
+    <div class="nav-inner">
+      <a class="brand" href="#top" aria-label="Ostellos MS home">
+        <img src="logo.png" alt="Ostellos MS logo" class="brand-logo" loading="lazy" />
+        <span class="brand-name">Ostellos<span class="brand-accent">MS</span></span>
+      </a>
+
+      <nav class="nav-links" aria-label="Primary">
+        <a href="#features">Features</a>
+        <a href="#security">Security</a>
+        <a href="#deploy">Deploy</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+
+      <div class="nav-actions">
+        <button class="theme-toggle" aria-label="Toggle dark mode" id="theme-toggle">
+          <i class="ph ph-moon"></i>
+        </button>
+        <a class="btn btn-primary" href="#contact">Contact us</a>
+        <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false">
+          <i class="ph ph-list"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- ── Hero ──────────────────────────────────────────────────────────── -->
+    <section class="hero">
+      <div class="hero-ambient" aria-hidden="true">
+        <div class="hero-blob hero-blob--1"></div>
+        <div class="hero-blob hero-blob--2"></div>
+      </div>
+      <div class="hero-visual" aria-hidden="false">
+        <div id="cube-mount" role="img" aria-label="3D cube animation showing the different features of Ostellos MS coming together as one system"></div>
+      </div>
+    </section>
+
+    <!-- ── Intro copy (moved from hero) ──────────────────────────────────── -->
+    <section class="intro-copy" data-reveal>
+      <h1 class="hero-title">Run every hostel operation from one dashboard</h1>
+      <p class="hero-sub" data-reveal data-reveal-delay="80">Rooms, bookings, payments, maintenance, and visitors across all your halls. Self-hosted, secure, built for modern hospitality.</p>
+      <div class="hero-ctas" data-reveal data-reveal-delay="160">
+        <a class="btn btn-primary btn-lg" href="#contact">Contact us</a>
+        <a class="btn btn-ghost btn-lg" href="#features">See how it works</a>
+      </div>
+      <ul class="hero-meta" data-reveal data-reveal-delay="240">
+        <li><i class="ph ph-check"></i> Self-hosted, pay only for your infrastructure</li>
+        <li><i class="ph ph-check"></i> Multi-hall</li>
+        <li><i class="ph ph-check"></i> 2FA for staff</li>
+      </ul>
+    </section>
+
+    <!-- ── Capability ticker ─────────────────────────────────────────────── -->
+    <section class="ticker" aria-label="Capabilities" data-reveal>
+      <div class="ticker-track">
+        <div class="ticker-group">
+          <span>Bookings</span><i class="ph ph-seal-check"></i>
+          <span>Payments</span><i class="ph ph-seal-check"></i>
+          <span>Maintenance</span><i class="ph ph-seal-check"></i>
+          <span>Visitors</span><i class="ph ph-seal-check"></i>
+          <span>Reports</span><i class="ph ph-seal-check"></i>
+          <span>2FA</span><i class="ph ph-seal-check"></i>
+          <span>Room transfers</span><i class="ph ph-seal-check"></i>
+          <span>Audit log</span><i class="ph ph-seal-check"></i>
+          <span>CSV &amp; Excel import</span><i class="ph ph-seal-check"></i>
+          <span>In-app alerts</span><i class="ph ph-seal-check"></i>
+        </div>
+        <div class="ticker-group" aria-hidden="true">
+          <span>Bookings</span><i class="ph ph-seal-check"></i>
+          <span>Payments</span><i class="ph ph-seal-check"></i>
+          <span>Maintenance</span><i class="ph ph-seal-check"></i>
+          <span>Visitors</span><i class="ph ph-seal-check"></i>
+          <span>Reports</span><i class="ph ph-seal-check"></i>
+          <span>2FA</span><i class="ph ph-seal-check"></i>
+          <span>Room transfers</span><i class="ph ph-seal-check"></i>
+          <span>Audit log</span><i class="ph ph-seal-check"></i>
+          <span>CSV &amp; Excel import</span><i class="ph ph-seal-check"></i>
+          <span>In-app alerts</span><i class="ph ph-seal-check"></i>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── The problem (before) ─────────────────────────────────────────── -->
+    <section class="section problem" id="problem">
+      <div class="section-head" data-reveal>
+        <span class="section-kicker"><i class="ph ph-warning-circle"></i> The problem</span>
+        <h2 class="section-title">Running a hostel without a system shouldn't feel like this</h2>
+        <p class="section-sub">A hostel is a hundred small transactions a day. On paper and WhatsApp, they slip — through notebooks, memory, and last-minute calls. This is what that actually looks like.</p>
+      </div>
+
+      <div class="problem-grid">
+        <article class="pain-cell" data-reveal>
+          <div class="cell-icon"><i class="ph ph-calendar-x"></i></div>
+          <h3>Rooms promised twice</h3>
+          <p>Bookings live in notebooks and chat groups. By Friday, two residents think they own the same bed — and someone sleeps in the common room.</p>
+        </article>
+        <article class="pain-cell" data-reveal data-reveal-delay="80">
+          <div class="cell-icon"><i class="ph ph-wallet"></i></div>
+          <h3>Cash with no paper trail</h3>
+          <p>Payments get taken, notes get lost, and "I already paid" becomes an argument nobody can settle. Balances are whatever someone remembers.</p>
+        </article>
+        <article class="pain-cell" data-reveal data-reveal-delay="160">
+          <div class="cell-icon"><i class="ph ph-wrench"></i></div>
+          <h3>Requests that vanish</h3>
+          <p>A broken bulb is mentioned at the gate, scribbled on a scrap, or yelled across the office. Weeks later it's still flickering — and nobody knows who was supposed to fix it.</p>
+        </article>
+        <article class="pain-cell" data-reveal>
+          <div class="cell-icon"><i class="ph ph-users-three"></i></div>
+          <h3>Visitors with no record</h3>
+          <p>No log of who came in, when, or who they came to see. If something goes missing, there's no list to check — just a lot of "I don't know".</p>
+        </article>
+        <article class="pain-cell" data-reveal data-reveal-delay="80">
+          <div class="cell-icon"><i class="ph ph-chart-bar"></i></div>
+          <h3>Numbers you can only guess</h3>
+          <p>How full are we? What did we collect this month? The owner asks, and you reach for a calculator and an estimate you can't back up.</p>
+        </article>
+        <article class="pain-cell" data-reveal data-reveal-delay="160">
+          <div class="cell-icon"><i class="ph ph-files"></i></div>
+          <h3>Data that dies with a laptop</h3>
+          <p>Everything lives in one Excel file on one computer. A spill, a crash, a forgotten backup — and a whole term's records are gone.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- ── The fix (after) ───────────────────────────────────────────────── -->
+    <section class="section fix" id="fix">
+      <div class="section-head" data-reveal>
+        <span class="section-kicker"><i class="ph ph-check-circle"></i> The fix</span>
+        <h2 class="section-title">Ostellos MS closes every one of those cracks</h2>
+        <p class="section-sub">One system, live across every hall. The same shift, but the paper, the guesswork, and the arguments are gone.</p>
+      </div>
+
+      <div class="fix-list">
+        <div class="fix-row" data-reveal>
+          <span class="fix-before"><i class="ph ph-calendar-x"></i> Rooms promised twice</span>
+          <span class="fix-arrow"><i class="ph ph-arrow-right"></i></span>
+          <span class="fix-after"><i class="ph ph-calendar-check"></i> Live availability, never double-booked</span>
+        </div>
+        <div class="fix-row" data-reveal data-reveal-delay="60">
+          <span class="fix-before"><i class="ph ph-wallet"></i> Cash with no paper trail</span>
+          <span class="fix-arrow"><i class="ph ph-arrow-right"></i></span>
+          <span class="fix-after"><i class="ph ph-bank"></i> Every payment recorded, balances that clear</span>
+        </div>
+        <div class="fix-row" data-reveal data-reveal-delay="120">
+          <span class="fix-before"><i class="ph ph-wrench"></i> Requests that vanish</span>
+          <span class="fix-arrow"><i class="ph ph-arrow-right"></i></span>
+          <span class="fix-after"><i class="ph ph-check-circle"></i> Logged once, tracked to resolution</span>
+        </div>
+        <div class="fix-row" data-reveal data-reveal-delay="180">
+          <span class="fix-before"><i class="ph ph-users-three"></i> Visitors with no record</span>
+          <span class="fix-arrow"><i class="ph ph-arrow-right"></i></span>
+          <span class="fix-after"><i class="ph ph-user-check"></i> Timestamped check-ins, linked to residents</span>
+        </div>
+        <div class="fix-row" data-reveal data-reveal-delay="240">
+          <span class="fix-before"><i class="ph ph-chart-bar"></i> Numbers you can only guess</span>
+          <span class="fix-arrow"><i class="ph ph-arrow-right"></i></span>
+          <span class="fix-after"><i class="ph ph-trend-up"></i> Dashboards for revenue, occupancy, and fill</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Features bento ────────────────────────────────────────────────── -->
+    <section class="section" id="features">
+      <div class="section-head" data-reveal>
+        <h2 class="section-title">Everything you need, one smart system</h2>
+        <p class="section-sub">Roles for admins, wardens, and residents. Hall-scoped permissions keep every campus organized.</p>
+      </div>
+
+      <div class="bento" id="bento-grid">
+        <article class="bento-cell cell-rooms" data-reveal>
+          <div class="cell-icon"><i class="ph ph-bed"></i></div>
+          <h3>Rooms that manage themselves</h3>
+          <p>Live status for every room: available, occupied, or under maintenance. Bulk import via CSV or Excel, and rooms auto-free a week after checkout.</p>
+          <ul class="cell-list">
+            <li><i class="ph ph-check-circle"></i> Multi-hall organization</li>
+            <li><i class="ph ph-check-circle"></i> Room transfers</li>
+            <li><i class="ph ph-check-circle"></i> Smart availability heals itself</li>
+          </ul>
+        </article>
+
+        <article class="bento-cell cell-bookings" data-reveal data-reveal-delay="80">
+          <div class="cell-icon"><i class="ph ph-calendar-check"></i></div>
+          <h3>Bookings end to end</h3>
+          <p>From request to checkout. Residents browse live availability and book; staff approve, transfer, and bulk check in.</p>
+        </article>
+
+        <article class="bento-cell cell-payments" data-reveal data-reveal-delay="0">
+          <div class="cell-icon"><i class="ph ph-wallet"></i></div>
+          <h3>Payments, tracked</h3>
+          <p>Record payments, track installments, and watch the balance clear with every partial payment.</p>
+        </article>
+
+        <article class="bento-cell cell-maintenance" data-reveal data-reveal-delay="80">
+          <div class="cell-icon"><i class="ph ph-wrench"></i></div>
+          <h3>Maintenance, tracked</h3>
+          <p>Staff and residents log requests. Wardens get notified the moment status changes from pending to resolved.</p>
+        </article>
+
+        <article class="bento-cell cell-visitors" data-reveal data-reveal-delay="160">
+          <div class="cell-icon"><i class="ph ph-users-three"></i></div>
+          <h3>Visitors, logged</h3>
+          <p>Check visitors in and out, linked to the resident they came to see. Hall-scoped, timestamped, searchable.</p>
+        </article>
+
+        <article class="bento-cell cell-reports" data-reveal>
+          <div class="cell-icon"><i class="ph ph-chart-bar"></i></div>
+          <h3>Dashboards that decide</h3>
+          <p>KPI cards, a revenue trend, and an occupancy donut per role. Export any report to CSV with a click.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- ── Deep dive ─────────────────────────────────────────────────────── -->
+    <section class="section split" id="workflow">
+      <div class="split-copy" data-reveal>
+        <h2 class="section-title">A workflow for every role</h2>
+        <p class="section-sub">Admins run the campus. Wardens own their hall. Residents self-serve. One login experience, three different realities.</p>
+        <ul class="role-list">
+          <li>
+            <span class="role-icon"><i class="ph ph-shield-star"></i></span>
+            <div>
+              <strong>Admin</strong>
+              <p>Halls, wardens, field definitions, audit log, backups, and global settings from one place.</p>
+            </div>
+          </li>
+          <li>
+            <span class="role-icon"><i class="ph ph-user-gear"></i></span>
+            <div>
+              <strong>Warden</strong>
+              <p>A hall-scoped view with a pending-count badge, so nothing slips through the shift.</p>
+            </div>
+          </li>
+          <li>
+            <span class="role-icon"><i class="ph ph-house-line"></i></span>
+            <div>
+              <strong>Resident</strong>
+              <p>Browse rooms, request bookings, pay toward the balance, report maintenance, and check out.</p>
+            </div>
+          </li>
+        </ul>
+      </div>
+      <div class="split-visual">
+        <div class="phone-frame">
+          <div class="phone-screen">
+            <div class="phone-status">
+              <span class="phone-app">Ostellos</span>
+              <span class="phone-bell"><i class="ph ph-bell"></i><span class="badge-dot"></span></span>
+            </div>
+            <div class="phone-greet">
+              <strong>Good morning, Aisha</strong>
+              <span>Balance due this month</span>
+              <span class="phone-amount mono">12,500.00</span>
+            </div>
+            <div class="phone-card">
+              <span>My booking</span>
+              <strong>Hall A · Room 204</strong>
+              <div class="phone-progress"><span style="width:78%"></span></div>
+              <small>78% of term completed</small>
+            </div>
+            <div class="phone-actions">
+              <span class="phone-action"><i class="ph ph-wrench"></i>Report issue</span>
+              <span class="phone-action"><i class="ph ph-wallet"></i>Pay now</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Security ──────────────────────────────────────────────────────── -->
+    <section class="section section-dark" id="security">
+      <div class="section-head" data-reveal>
+        <h2 class="section-title">Secure by default</h2>
+        <p class="section-sub">Every staff account uses two-factor authentication. Every write is audited. Every page ships hardened.</p>
+      </div>
+      <div class="security-grid">
+        <article class="sec-cell" data-reveal>
+          <div class="cell-icon"><i class="ph ph-lock-key"></i></div>
+          <h3>Two-factor auth</h3>
+          <p>TOTP required for all admin and warden accounts. Session tokens regenerate on privilege changes.</p>
+        </article>
+        <article class="sec-cell" data-reveal data-reveal-delay="80">
+          <div class="cell-icon"><i class="ph ph-fingerprint"></i></div>
+          <h3>Hardened headers</h3>
+          <p>Nonce-based CSP, HSTS, and strict cross-origin policies on every response, with a CSP violation reporter.</p>
+        </article>
+        <article class="sec-cell" data-reveal data-reveal-delay="160">
+          <div class="cell-icon"><i class="ph ph-scroll"></i></div>
+          <h3>Full audit log</h3>
+          <p>Every staff mutation is recorded: who, what, when, and where. Filterable and exportable.</p>
+        </article>
+        <article class="sec-cell" data-reveal>
+          <div class="cell-icon"><i class="ph ph-gauge"></i></div>
+          <h3>Rate limiting</h3>
+          <p>Login, registration, bookings, payments, and the search API are throttled per IP and per user.</p>
+        </article>
+        <article class="sec-cell" data-reveal data-reveal-delay="80">
+          <div class="cell-icon"><i class="ph ph-database"></i></div>
+          <h3>Backup &amp; restore</h3>
+          <p>One-click backups of SQLite or PostgreSQL from the admin panel, with scheduled nightly cron backups.</p>
+        </article>
+        <article class="sec-cell" data-reveal data-reveal-delay="160">
+          <div class="cell-icon"><i class="ph ph-pulse"></i></div>
+          <h3>Observability built in</h3>
+          <p>Prometheus metrics, OpenTelemetry tracing, and Sentry error tracking. Know before your residents do.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- ── Testimonials ──────────────────────────────────────────────────── -->
+    <section class="section" id="testimonials">
+      <div class="section-head" data-reveal>
+        <h2 class="section-title">Loved by hostel teams</h2>
+        <p class="section-sub">From single halls to multi-campus estates.</p>
+      </div>
+      <div class="testi-grid">
+        <figure class="testi testi--featured" data-reveal>
+          <blockquote>
+            <p>"We moved two halls onto Ostellos in a weekend. Revenue tracking alone paid for the setup time."</p>
+          </blockquote>
+          <figcaption>
+            <span class="avatar" data-name="JK">JK</span>
+            <div><strong>Jane Kettle</strong><span>Estate Admin</span></div>
+          </figcaption>
+        </figure>
+        <div class="testi-side">
+          <figure class="testi" data-reveal data-reveal-delay="80">
+            <blockquote>
+              <p>"The resident portal stopped the line at my office. Bookings and payments now come through the app first."</p>
+            </blockquote>
+            <figcaption>
+              <span class="avatar" data-name="RO">RO</span>
+              <div><strong>Ryan Osman</strong><span>Head Warden</span></div>
+            </figcaption>
+          </figure>
+          <figure class="testi" data-reveal data-reveal-delay="160">
+            <blockquote>
+              <p>"Two-factor auth and the audit log sold my committee. The reporting answered every question at review."</p>
+            </blockquote>
+            <figcaption>
+              <span class="avatar" data-name="NM">NM</span>
+              <div><strong>Nadia Martin</strong><span>Director</span></div>
+            </figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Why Ostellos ────────────────────────────────────────── -->
+    <section class="section deploy" id="deploy">
+      <div class="section-head" data-reveal>
+        <h2 class="section-title">Why Ostellos MS</h2>
+        <p class="section-sub">Purpose-built for hostels. No bloat, no vendor lock-in.</p>
+      </div>
+      <div class="deploy-cards">
+        <div class="deploy-card" data-reveal>
+          <span class="deploy-number">01</span>
+          <div class="deploy-card-body">
+            <h3>Fast setup</h3>
+            <p>Docker or plain Flask. Get a working system in minutes, not days.</p>
+          </div>
+        </div>
+        <div class="deploy-card" data-reveal data-reveal-delay="100">
+          <span class="deploy-number">02</span>
+          <div class="deploy-card-body">
+            <h3>Secure by design</h3>
+            <p>2FA, audit logs, and hardened headers on every deployment.</p>
+          </div>
+        </div>
+        <div class="deploy-card" data-reveal data-reveal-delay="200">
+          <span class="deploy-number">03</span>
+          <div class="deploy-card-body">
+            <h3>Professional support</h3>
+            <p>Implementation, training, and ongoing support from the team that built it.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── FAQ ───────────────────────────────────────────────────────────── -->
+    <section class="section" id="faq">
+      <div class="section-head" data-reveal>
+        <h2 class="section-title">Frequently asked</h2>
+      </div>
+      <div class="faq-grid">
+        <div class="faq-col">
+          <details class="faq-item" open>
+            <summary>How do I get started?<i class="ph ph-plus faq-icon"></i></summary>
+            <p>Reach out to us with your hostel details and we'll set up a personalized demo. You can also explore the system's features below and see how it works for teams like yours.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Which database does it use?<i class="ph ph-plus faq-icon"></i></summary>
+            <p>SQLite is used by default for development and local testing. For production deployments, PostgreSQL is supported and recommended. Migration scripts handle both databases automatically using Alembic.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Can I run more than one hall?<i class="ph ph-plus faq-icon"></i></summary>
+            <p>Yes — you can create multiple halls with their own room inventories, wardens, and occupancy statistics. The admin dashboard includes a hall comparison view showing occupancy percentage and revenue across all halls simultaneously.</p>
+          </details>
+        </div>
+        <div class="faq-col">
+          <details class="faq-item">
+            <summary>How are payments handled?<i class="ph ph-plus faq-icon"></i></summary>
+            <p>All payments are recorded and fully auditable. The system supports partial payments through an installment system, automatically tracking balances against booking amounts. Every transaction is logged with timestamps, payment methods, and user references.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Is there an API?<i class="ph ph-plus faq-icon"></i></summary>
+            <p>Yes, the system includes a REST API v1 with OpenAPI 3.0 documentation. The API supports hall-scoped search operations, rate-limiting protection, and provides health monitoring endpoints. All API access is protected by the same authentication and authorization rules as the web application.</p>
+          </details>
+          <details class="faq-item">
+            <summary>What are the costs?<i class="ph ph-plus faq-icon"></i></summary>
+            <p>Ostellos MS is self-hosted, so there are no licensing fees or per-user charges. You pay only for your hosting infrastructure and any third-party services you integrate (like email providers or payment gateways). Contact us for a tailored deployment quote.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <section class="section cta" id="contact">
+      <div class="cta-card" data-reveal>
+        <h2 class="cta-title">Ready to see it in action?</h2>
+        <p class="cta-sub">Tell us about your hostel and we'll set up a personalized demo.</p>
+        <a class="btn btn-primary btn-lg" href="#contact-form">Get in touch</a>
+      </div>
+    </section>
+  </main>
+
+  <!-- ── Contact ──────────────────────────────────────────────── -->
+  <section class="section" id="contact-form">
+    <div class="section-head" data-reveal>
+      <h2 class="section-title">Get in touch</h2>
+      <p class="section-sub">Tell us about your hostel and we'll set up a personalized demo.</p>
+    </div>
+    <form class="contact-form" data-reveal action="mailto:Ostellos@gmail.com" method="POST" enctype="text/plain">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="contact-name">Name</label>
+          <input type="text" id="contact-name" name="name" required placeholder="Your name" />
+        </div>
+        <div class="form-group">
+          <label for="contact-email">Email</label>
+          <input type="email" id="contact-email" name="email" required placeholder="you@example.com" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="contact-org">Organization</label>
+        <input type="text" id="contact-org" name="org" placeholder="Hostel name or organization" />
+      </div>
+      <div class="form-group">
+        <label for="contact-message">Message</label>
+        <textarea id="contact-message" name="message" rows="5" required placeholder="Tell us about your needs..."></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary btn-lg">Send message</button>
+    </form>
+  </section>
+
+  <!-- ── Footer ──────────────────────────────────────────────── -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <img src="logo.png" alt="Ostellos MS logo" class="brand-logo" />
+        <p>Self-hosted hostel management for modern campuses. Professional implementation, training, and support from the team that built it.</p>
+      </div>
+      <div class="footer-cols">
+        <div>
+          <h4>Product</h4>
+          <a href="#features">Features</a>
+          <a href="#security">Security</a>
+          <a href="#deploy">Deploy</a>
+          <a href="#faq">FAQ</a>
+        </div>
+        <div>
+          <h4>Contact</h4>
+          <a href="mailto:Ostellos@gmail.com">Ostellos@gmail.com</a>
+          <a href="tel:+256771992738">+256 771 992 738</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>Ostellos MS · © 2026</span>
+      <div class="footer-legal">
+        <a href="#">Privacy policy</a>
+        <a href="#">Terms of service</a>
+      </div>
+    </div>
+    <p class="footer-credit">Hero cube model: "Cube" by <a href="https://sketchfab.com/artworkguide" target="_blank" rel="noopener">artwork guide</a> on Sketchfab, licensed under <a href="http://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC-BY-4.0</a>.</p>
+  </div>
+    </div>
+  </footer>
+
+  <!-- Noise overlay for texture -->
+  <div class="noise-overlay" aria-hidden="true"></div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      var toggle = document.getElementById("theme-toggle");
+      var link = document.getElementById("dark-theme-link");
+      if (!toggle || !link) return;
+      var isDark = localStorage.getItem("theme") === "dark";
+      if (isDark) {
+        link.disabled = false;
+        toggle.innerHTML = '<i class="ph ph-sun"></i>';
+        document.documentElement.setAttribute('data-theme', 'dark');
+      } else {
+        toggle.innerHTML = '<i class="ph ph-moon"></i>';
+        document.documentElement.removeAttribute('data-theme');
+      }
+      toggle.addEventListener("click", function() {
+        var isDarkMode = link.disabled;
+        link.disabled = !isDarkMode;
+        if (isDarkMode) {
+          document.documentElement.setAttribute('data-theme', 'dark');
+          localStorage.setItem("theme", "dark");
+          toggle.innerHTML = '<i class="ph ph-sun"></i>';
+        } else {
+          document.documentElement.removeAttribute('data-theme');
+          localStorage.setItem("theme", "light");
+          toggle.innerHTML = '<i class="ph ph-moon"></i>';
+        }
+      });
+    });
+  </script>
+</body>
+</html>
