@@ -292,39 +292,39 @@
     <!-- ── Security ──────────────────────────────────────────────────────── -->
     <section class="section section-dark" id="security">
       <div class="section-head" data-reveal>
-        <h2 class="section-title">Secure by default</h2>
-        <p class="section-sub">Every staff account uses two-factor authentication. Every write is audited. Every page ships hardened.</p>
+        <h2 class="section-title" data-decrypt>Secure by default</h2>
+        <p class="section-sub" data-decrypt>Every staff account uses two-factor authentication. Every write is audited. Every page ships hardened.</p>
       </div>
       <div class="security-grid">
         <article class="sec-cell" data-reveal>
           <div class="cell-icon"><i class="ph ph-lock-key"></i></div>
-          <h3>Two-factor auth</h3>
-          <p>TOTP required for all admin and warden accounts. Session tokens regenerate on privilege changes.</p>
+          <h3 data-decrypt>Two-factor auth</h3>
+          <p data-decrypt>TOTP required for all admin and warden accounts. Session tokens regenerate on privilege changes.</p>
         </article>
         <article class="sec-cell" data-reveal data-reveal-delay="80">
           <div class="cell-icon"><i class="ph ph-fingerprint"></i></div>
-          <h3>Hardened headers</h3>
-          <p>Nonce-based CSP, HSTS, and strict cross-origin policies on every response, with a CSP violation reporter.</p>
+          <h3 data-decrypt>Hardened headers</h3>
+          <p data-decrypt>Nonce-based CSP, HSTS, and strict cross-origin policies on every response, with a CSP violation reporter.</p>
         </article>
         <article class="sec-cell" data-reveal data-reveal-delay="160">
           <div class="cell-icon"><i class="ph ph-scroll"></i></div>
-          <h3>Full audit log</h3>
-          <p>Every staff mutation is recorded: who, what, when, and where. Filterable and exportable.</p>
+          <h3 data-decrypt>Full audit log</h3>
+          <p data-decrypt>Every staff mutation is recorded: who, what, when, and where. Filterable and exportable.</p>
         </article>
         <article class="sec-cell" data-reveal>
           <div class="cell-icon"><i class="ph ph-gauge"></i></div>
-          <h3>Rate limiting</h3>
-          <p>Login, registration, bookings, payments, and the search API are throttled per IP and per user.</p>
+          <h3 data-decrypt>Rate limiting</h3>
+          <p data-decrypt>Login, registration, bookings, payments, and the search API are throttled per IP and per user.</p>
         </article>
         <article class="sec-cell" data-reveal data-reveal-delay="80">
           <div class="cell-icon"><i class="ph ph-database"></i></div>
-          <h3>Backup &amp; restore</h3>
-          <p>One-click backups of SQLite or PostgreSQL from the admin panel, with scheduled nightly cron backups.</p>
+          <h3 data-decrypt>Backup &amp; restore</h3>
+          <p data-decrypt>One-click backups of SQLite or PostgreSQL from the admin panel, with scheduled nightly cron backups.</p>
         </article>
         <article class="sec-cell" data-reveal data-reveal-delay="160">
           <div class="cell-icon"><i class="ph ph-pulse"></i></div>
-          <h3>Observability built in</h3>
-          <p>Prometheus metrics, OpenTelemetry tracing, and Sentry error tracking. Know before your residents do.</p>
+          <h3 data-decrypt>Observability built in</h3>
+          <p data-decrypt>Prometheus metrics, OpenTelemetry tracing, and Sentry error tracking. Know before your residents do.</p>
         </article>
       </div>
     </section>

@@ -434,6 +434,14 @@ ul { list-style: none; }
   color: #22d3ee;
 }
 
+[data-decrypt] {
+  font-family: 'JetBrains Mono', monospace;
+  transition: font-family 0.3s ease;
+}
+[data-decrypt].decrypted {
+  font-family: inherit;
+}
+
 /* ── Bento ────────────────────────────────────────────────────────────── */
 .bento {
   display: grid; grid-template-columns: repeat(6, 1fr); gap: 16px;
