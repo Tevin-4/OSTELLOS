@@ -27,7 +27,7 @@
 .cube-overlay--right {
   right: 0;
   padding: 0 40px 0 24px;
-  text-align: right;
+  text-align: left;
 }
 
 .cube-overlay--right .cube-headline {
@@ -80,6 +80,7 @@
 
   .cube-overlay--right .cube-headline {
     white-space: normal;
+    text-align: center;
   }
 
   .cube-headline {

@@ -5,8 +5,8 @@ function initNavPill() {
   if (!nav) return;
   const onScroll = () => {
     const y = window.scrollY;
-    const start = 10;
-    const end = 100;
+    const start = 20;
+    const end = 200;
     const progress = Math.min(1, Math.max(0, (y - start) / (end - start)));
     const ease = progress * progress * (3 - 2 * progress);
     nav.style.setProperty('--pill', ease);
