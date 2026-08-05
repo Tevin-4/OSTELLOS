@@ -341,6 +341,7 @@ function Scene({ onAnimUpdate }) {
   const { camera } = useThree();
   const animRef = useAnimationMachine();
   const lastShowRef = useRef({ showLeft: true, showRight: false });
+  const dropRef = useRef({ t: 0, done: false });
 
   const GROUP_Y_OFFSET = 0.35;
 
@@ -358,13 +359,38 @@ function Scene({ onAnimUpdate }) {
   useFrame(({ pointer }) => {
     if (!groupRef.current) return;
 
-    const targetRY = 0.35 + pointer.x * 0.5;
-    const targetRX = 0.12 + pointer.y * 0.4;
-    groupRef.current.rotation.y += (targetRY - groupRef.current.rotation.y) * 0.12;
-    groupRef.current.rotation.x += (targetRX - groupRef.current.rotation.x) * 0.12;
+    // Drop-in entrance animation
+    const drop = dropRef.current;
+    if (!drop.done) {
+      drop.t += delta;
+      const dur = 1.2;
+      const progress = Math.min(drop.t / dur, 1);
+      // Elastic ease out
+      const p = progress;
+      const elastic = p === 1 ? 1 : Math.pow(2, -10 * p) * Math.sin((p * 10 - 0.75) * ((2 * Math.PI) / 3)) + 1;
+      const dropY = 5 * (1 - elastic);
+      const dropScale = 0.3 + 0.7 * elastic;
+      const dropRotX = -0.5 * (1 - elastic);
 
-    const targetY = GROUP_Y_OFFSET + animRef.current.groupY;
-    groupRef.current.position.y += (targetY - groupRef.current.position.y) * 0.06;
+      groupRef.current.position.y = GROUP_Y_OFFSET + dropY + animRef.current.groupY;
+      groupRef.current.scale.setScalar(dropScale);
+      groupRef.current.rotation.x = dropRotX;
+
+      if (progress >= 1) {
+        drop.done = true;
+        groupRef.current.scale.setScalar(1);
+        groupRef.current.rotation.x = 0;
+      }
+    } else {
+      // Normal animation
+      const targetRY = 0.35 + pointer.x * 0.5;
+      const targetRX = 0.12 + pointer.y * 0.4;
+      groupRef.current.rotation.y += (targetRY - groupRef.current.rotation.y) * 0.12;
+      groupRef.current.rotation.x += (targetRX - groupRef.current.rotation.x) * 0.12;
+
+      const targetY = GROUP_Y_OFFSET + animRef.current.groupY;
+      groupRef.current.position.y += (targetY - groupRef.current.position.y) * 0.06;
+    }
 
     const { showLeft, showRight } = animRef.current;
     if (showLeft !== lastShowRef.current.showLeft || showRight !== lastShowRef.current.showRight) {
