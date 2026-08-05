@@ -84,7 +84,7 @@ function FeatureCube({ index, restPos, splitPos, accent, title, icon, animRef })
       tx = restPos[0]; ty = restPos[1]; tz = restPos[2];
     }
 
-    const lerp = 0.08;
+    const lerp = 0.12;
     m.position.x += (tx - m.position.x) * lerp;
     m.position.y += (ty - m.position.y) * lerp;
     m.position.z += (tz - m.position.z) * lerp;
@@ -220,7 +220,7 @@ function SolidShell({ animRef }) {
         roughness: 0.32,
         emissive: new THREE.Color(0x000000),
         emissiveIntensity: 0,
-        transparent: false,
+        transparent: true,
         opacity: 1,
       }),
     []
@@ -228,6 +228,11 @@ function SolidShell({ animRef }) {
 
   useFrame(() => {
     if (!ref.current) return;
+    const { phase } = animRef.current;
+    const assembled = phase === 'idle' || phase === 'merge' || phase === 'fade' || phase === 'pause';
+    const targetOpacity = assembled ? 1 : 0;
+    mat.opacity += (targetOpacity - mat.opacity) * 0.1;
+    mat.transparent = mat.opacity < 0.99;
     mat.color.setHex(isDark ? 0xffffff : 0x2ec4b6);
   });
 
