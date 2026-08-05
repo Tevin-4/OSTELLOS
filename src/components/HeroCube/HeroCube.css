@@ -63,7 +63,7 @@
   }
 
   .cube-overlay--left {
-    top: 10%;
+    top: 6%;
     left: 0;
     right: 0;
     transform: none;
@@ -71,7 +71,7 @@
 
   .cube-overlay--right {
     top: auto;
-    bottom: 8%;
+    bottom: 6%;
     left: 0;
     right: 0;
     transform: none;
@@ -83,7 +83,7 @@
   }
 
   .cube-headline {
-    font-size: clamp(20px, 5vw, 32px);
+    font-size: clamp(26px, 7vw, 40px);
   }
 }
 

@@ -99,7 +99,7 @@ function FeatureCube({ index, restPos, splitPos, accent, title, icon, phase, pha
     // when cubes are merged into one solid cube, render opaque so internal
     // faces are hidden by depth-testing (no visible seams). when split, keep
     // transparent for the dimming effect.
-    const assembled = phase === 'intro' || phase === 'merge' || phase === 'outro' || phase === 'pause' || phase === 'idle';
+    const assembled = phase === 'idle' || phase === 'merge' || phase === 'fade' || phase === 'pause';
     baseMat.transparent = !assembled;
     if (assembled) baseMat.opacity = 1;
 
@@ -191,7 +191,7 @@ function WireframePulse({ phase }) {
 
   useFrame(() => {
     if (!ref.current) return;
-    const show = phase === 'outro' || phase === 'merge';
+    const show = phase === 'fade' || phase === 'merge';
     const target = show ? 0.35 : 0;
     ref.current.material.opacity += (target - ref.current.material.opacity) * 0.1;
     if (show) {
@@ -292,13 +292,14 @@ function useAnimationMachine() {
   const stepRef = useRef(0);
 
   const PHASES = [
-    { name: 'intro',        duration: 2800 },
-    { name: 'split',        duration: 900  },
-    { name: 'highlight',    duration: 750 * 8, perCube: 750 },
-    { name: 'pre-merge',    duration: 400  },
-    { name: 'merge',        duration: 900  },
-    { name: 'outro',        duration: 2800 },
-    { name: 'pause',        duration: 1200 },
+    { name: 'intro',     duration: 2800 },
+    { name: 'split',     duration: 900  },
+    { name: 'highlight', duration: 750 * 8, perCube: 750 },
+    { name: 'right',     duration: 2800 },
+    { name: 'pre-merge', duration: 400  },
+    { name: 'merge',     duration: 900  },
+    { name: 'fade',      duration: 800  },
+    { name: 'pause',     duration: 1000 },
   ];
 
   useFrame((_, delta) => {
@@ -315,15 +316,17 @@ function useAnimationMachine() {
       if (next.name === 'intro') {
         setState((s) => ({ ...s, phase: 'idle', highlightIndex: -1, groupY: 0, showLeft: true, showRight: false }));
       } else if (next.name === 'split') {
-        setState((s) => ({ ...s, phase: 'split', groupY: 0.15, showLeft: false, showRight: false }));
+        setState((s) => ({ ...s, phase: 'split', groupY: 0.15, showLeft: true, showRight: false }));
       } else if (next.name === 'highlight') {
-        setState((s) => ({ ...s, phase: 'highlight', highlightIndex: 0 }));
+        setState((s) => ({ ...s, phase: 'highlight', highlightIndex: 0, showLeft: true, showRight: false }));
+      } else if (next.name === 'right') {
+        setState((s) => ({ ...s, phase: 'right', showLeft: true, showRight: true }));
       } else if (next.name === 'pre-merge') {
-        setState((s) => ({ ...s, phase: 'pre-merge', highlightIndex: -1 }));
+        setState((s) => ({ ...s, phase: 'pre-merge', highlightIndex: -1, showLeft: true, showRight: true }));
       } else if (next.name === 'merge') {
-        setState((s) => ({ ...s, phase: 'merge', groupY: 0 }));
-      } else if (next.name === 'outro') {
-        setState((s) => ({ ...s, phase: 'outro', showLeft: false, showRight: true }));
+        setState((s) => ({ ...s, phase: 'merge', groupY: 0, showLeft: true, showRight: true }));
+      } else if (next.name === 'fade') {
+        setState((s) => ({ ...s, phase: 'fade', showLeft: false, showRight: false }));
       } else if (next.name === 'pause') {
         setState((s) => ({ ...s, phase: 'pause', showLeft: false, showRight: false }));
       }
@@ -351,8 +354,14 @@ function Scene({ onAnimUpdate }) {
   const GROUP_X_OFFSET = 0;
 
   useEffect(() => {
-    camera.position.set(5.5, 3.8, 5);
-    camera.lookAt(0, 0.15, 0);
+    const isMobile = window.innerWidth <= 768;
+    if (isMobile) {
+      camera.position.set(7, 4.5, 7);
+      camera.lookAt(0, 0.1, 0);
+    } else {
+      camera.position.set(5.5, 3.8, 5);
+      camera.lookAt(0, 0.15, 0);
+    }
   }, [camera]);
 
   useEffect(() => {
