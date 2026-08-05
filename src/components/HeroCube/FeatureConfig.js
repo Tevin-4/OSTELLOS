@@ -11,4 +11,4 @@ export const FEATURES = [
 
 export const CUBE_SIZE = 0.5;
 export const STEP = CUBE_SIZE / 2;
-export const SPLIT_MULT = 3.2;
+export const SPLIT_MULT = 4.0;

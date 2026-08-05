@@ -84,7 +84,7 @@ function FeatureCube({ index, restPos, splitPos, accent, title, icon, animRef })
       tx = restPos[0]; ty = restPos[1]; tz = restPos[2];
     }
 
-    const lerp = 0.12;
+    const lerp = 0.15;
     m.position.x += (tx - m.position.x) * lerp;
     m.position.y += (ty - m.position.y) * lerp;
     m.position.z += (tz - m.position.z) * lerp;
@@ -231,7 +231,7 @@ function SolidShell({ animRef }) {
     const { phase } = animRef.current;
     const assembled = phase === 'idle' || phase === 'merge' || phase === 'fade' || phase === 'pause';
     const targetOpacity = assembled ? 1 : 0;
-    mat.opacity += (targetOpacity - mat.opacity) * 0.1;
+    mat.opacity += (targetOpacity - mat.opacity) * 0.18;
     mat.transparent = mat.opacity < 0.99;
     mat.color.setHex(isDark ? 0xffffff : 0x2ec4b6);
   });
