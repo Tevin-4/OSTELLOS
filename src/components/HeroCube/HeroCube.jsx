@@ -1,4 +1,4 @@
-import React, { useRef, useMemo, useState, useEffect, useCallback } from 'react';
+import React, { useRef, useMemo, useState, useEffect } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Float, Html } from '@react-three/drei';
 import { EffectComposer, Bloom } from '@react-three/postprocessing';
@@ -17,6 +17,32 @@ function makePositions() {
 }
 const REST = makePositions();
 const SPLIT = REST.map((p) => p.map((v) => v * SPLIT_MULT));
+
+/* ─── Animation configuration constants ────────────────────── */
+const ANIMATION_CONFIG = {
+  drop: { duration: 1.5, startY: 8, startScale: 0.2 },
+  phases: {
+    intro: 2800,
+    split: 900,
+    highlight: 750 * 8,
+    right: 2800,
+    preMerge: 400,
+    merge: 900,
+    fade: 800,
+    pause: 1000,
+  },
+  lerp: {
+    cube: 0.15,
+    shell: 0.15,
+    group: 0.06,
+    rotation: 0.12,
+  },
+  colors: {
+    light: 0x2ec4b6,
+    dark: 0xffffff,
+    wireframe: 0x0891b2,
+  },
+};
 
 /* ─── theme hook (read once, observe changes) ──────────── */
 function useTheme() {
@@ -393,13 +419,13 @@ function Scene({ onAnimUpdate }) {
     const drop = dropRef.current;
     if (!drop.done) {
       drop.t += delta;
-      const dur = 1.5;
+      const dur = ANIMATION_CONFIG.drop.duration;
       const progress = Math.min(drop.t / dur, 1);
       // Elastic ease out
       const p = progress;
       const elastic = p === 1 ? 1 : Math.pow(2, -10 * p) * Math.sin((p * 10 - 0.75) * ((2 * Math.PI) / 3)) + 1;
-      const dropY = 8 * (1 - elastic);
-      const dropScale = 0.2 + 0.8 * elastic;
+      const dropY = ANIMATION_CONFIG.drop.startY * (1 - elastic);
+      const dropScale = ANIMATION_CONFIG.drop.startScale + (1 - ANIMATION_CONFIG.drop.startScale) * elastic;
       const dropRotX = -0.8 * (1 - elastic);
 
       groupRef.current.position.y = GROUP_Y_OFFSET + dropY + animRef.current.groupY;
@@ -416,11 +442,11 @@ function Scene({ onAnimUpdate }) {
       // Normal animation
       const targetRY = 0.35 + pointer.x * 0.5;
       const targetRX = 0.12 + pointer.y * 0.4;
-      groupRef.current.rotation.y += (targetRY - groupRef.current.rotation.y) * 0.12;
-      groupRef.current.rotation.x += (targetRX - groupRef.current.rotation.x) * 0.12;
+      groupRef.current.rotation.y += (targetRY - groupRef.current.rotation.y) * ANIMATION_CONFIG.lerp.rotation;
+      groupRef.current.rotation.x += (targetRX - groupRef.current.rotation.x) * ANIMATION_CONFIG.lerp.rotation;
 
       const targetY = GROUP_Y_OFFSET + animRef.current.groupY;
-      groupRef.current.position.y += (targetY - groupRef.current.position.y) * 0.06;
+      groupRef.current.position.y += (targetY - groupRef.current.position.y) * ANIMATION_CONFIG.lerp.group;
     }
 
     const { showLeft, showRight } = animRef.current;

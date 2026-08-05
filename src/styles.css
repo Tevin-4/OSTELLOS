@@ -108,16 +108,20 @@ ul { list-style: none; }
   border-radius: 0;
   width: 100%;
   box-shadow: none;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  will-change: transform, width, border-radius, box-shadow, background;
+  contain: layout style paint;
 }
 .nav--scrolled {
-  top: calc(12px * var(--pill));
+  top: 12px;
   left: 50%;
   transform: translateX(-50%);
-  width: calc(100% - (100% - min(92%, 720px)) * var(--pill));
-  border-radius: calc(999px * var(--pill));
+  width: min(92%, 720px);
+  border-radius: 999px;
   border: 1px solid var(--border);
-  box-shadow: 0 calc(8px * var(--pill)) calc(32px * var(--pill)) rgba(0, 0, 0, calc(0.08 * var(--pill)));
-  background: rgba(250, 251, 252, calc(0.88 + 0.04 * var(--pill)));
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  background: rgba(250, 251, 252, 0.92);
   border-bottom-color: transparent;
 }
 .nav-inner {
