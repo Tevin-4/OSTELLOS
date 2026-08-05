@@ -93,7 +93,7 @@ function FeatureCube({ index, restPos, splitPos, accent, title, icon, phase, pha
 
     // material — theme-aware base color
     const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-    const baseColor = isDark ? 0xffffff : 0x0891B2;
+    const baseColor = isDark ? 0xffffff : 0x2ec4b6;
     const emphasized = isActive || hovered;
 
     // when cubes are merged into one solid cube, render opaque so internal
@@ -234,7 +234,7 @@ function SolidShell({ phase }) {
   useFrame(() => {
     if (!ref.current) return;
     const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-    const baseColor = isDark ? 0xffffff : 0x0891B2;
+    const baseColor = isDark ? 0xffffff : 0x2ec4b6;
     mat.color.setHex(baseColor);
   });
 
@@ -245,13 +245,48 @@ function SolidShell({ phase }) {
   );
 }
 
+/* ─── typewriter text ───────────────────────────────────── */
+function TypewriterText({ text, trigger, speed = 60 }) {
+  const [displayed, setDisplayed] = useState('');
+  const [typing, setTyping] = useState(false);
+  const indexRef = useRef(0);
+
+  useEffect(() => {
+    if (trigger) {
+      setDisplayed('');
+      indexRef.current = 0;
+      setTyping(true);
+    } else {
+      setTyping(false);
+      setDisplayed('');
+      indexRef.current = 0;
+    }
+  }, [trigger]);
+
+  useEffect(() => {
+    if (!typing) return;
+    if (indexRef.current >= text.length) {
+      setTyping(false);
+      return;
+    }
+    const id = setTimeout(() => {
+      indexRef.current++;
+      setDisplayed(text.slice(0, indexRef.current));
+    }, speed);
+    return () => clearTimeout(id);
+  }, [typing, displayed, text, speed]);
+
+  return <span>{displayed}{typing && <span className="typewriter-cursor">|</span>}</span>;
+}
+
 /* ─── animation state machine ───────────────────────────── */
-function useAnimationMachine(headlineLeftRef, headlineRightRef) {
+function useAnimationMachine() {
   const [state, setState] = useState({
     phase: 'idle',
     highlightIndex: -1,
     groupY: 0,
-    headlineOpacity: 1,
+    showLeft: true,
+    showRight: false,
   });
   const timerRef = useRef(0);
   const stepRef = useRef(0);
@@ -278,12 +313,9 @@ function useAnimationMachine(headlineLeftRef, headlineRightRef) {
       const next = PHASES[stepRef.current % PHASES.length];
 
       if (next.name === 'intro') {
-        if (headlineLeftRef?.current) headlineLeftRef.current.style.opacity = '1';
-        if (headlineRightRef?.current) headlineRightRef.current.style.opacity = '0';
-        setState((s) => ({ ...s, phase: 'idle', highlightIndex: -1, groupY: 0 }));
+        setState((s) => ({ ...s, phase: 'idle', highlightIndex: -1, groupY: 0, showLeft: true, showRight: false }));
       } else if (next.name === 'split') {
-        if (headlineLeftRef?.current) headlineLeftRef.current.style.opacity = '0';
-        setState((s) => ({ ...s, phase: 'split', groupY: 0.15 }));
+        setState((s) => ({ ...s, phase: 'split', groupY: 0.15, showLeft: false, showRight: false }));
       } else if (next.name === 'highlight') {
         setState((s) => ({ ...s, phase: 'highlight', highlightIndex: 0 }));
       } else if (next.name === 'pre-merge') {
@@ -291,11 +323,9 @@ function useAnimationMachine(headlineLeftRef, headlineRightRef) {
       } else if (next.name === 'merge') {
         setState((s) => ({ ...s, phase: 'merge', groupY: 0 }));
       } else if (next.name === 'outro') {
-        if (headlineRightRef?.current) headlineRightRef.current.style.opacity = '1';
-        setState((s) => ({ ...s, phase: 'pulse' }));
+        setState((s) => ({ ...s, phase: 'outro', showLeft: false, showRight: true }));
       } else if (next.name === 'pause') {
-        if (headlineRightRef?.current) headlineRightRef.current.style.opacity = '0';
-        setState((s) => ({ ...s, phase: 'pause' }));
+        setState((s) => ({ ...s, phase: 'pause', showLeft: false, showRight: false }));
       }
     }
 
@@ -306,31 +336,28 @@ function useAnimationMachine(headlineLeftRef, headlineRightRef) {
         setState((s) => ({ ...s, highlightIndex: idx }));
       }
     }
-
-    // smooth group Y
-    setState((s) => {
-      const target = s.groupY;
-      // groupY is already the target, actual position is handled in the group
-      return s;
-    });
   });
 
   return state;
 }
 
 /* ─── scene internals ───────────────────────────────────── */
-function Scene({ headlineLeftRef, headlineRightRef }) {
+function Scene({ onAnimUpdate }) {
   const groupRef = useRef();
   const { camera } = useThree();
-  const anim = useAnimationMachine(headlineLeftRef, headlineRightRef);
+  const anim = useAnimationMachine();
 
   const GROUP_Y_OFFSET = 0.35;
-  const GROUP_X_OFFSET = 0.6;
+  const GROUP_X_OFFSET = 0;
 
   useEffect(() => {
     camera.position.set(5.5, 3.8, 5);
-    camera.lookAt(0.6, 0.15, 0);
+    camera.lookAt(0, 0.15, 0);
   }, [camera]);
+
+  useEffect(() => {
+    onAnimUpdate?.({ showLeft: anim.showLeft, showRight: anim.showRight });
+  }, [anim.showLeft, anim.showRight]);
 
   /* mouse parallax + group Y position */
   useFrame(({ pointer }) => {
@@ -389,8 +416,7 @@ function Scene({ headlineLeftRef, headlineRightRef }) {
 
 /* ─── exported component ────────────────────────────────── */
 export default function HeroCube() {
-  const headlineLeftRef = useRef(null);
-  const headlineRightRef = useRef(null);
+  const [animState, setAnimState] = useState({ showLeft: true, showRight: false });
 
   return (
     <div className="hero-cube-wrap">
@@ -400,16 +426,16 @@ export default function HeroCube() {
         camera={{ fov: 35, near: 0.1, far: 100 }}
         style={{ background: 'transparent' }}
       >
-        <Scene headlineLeftRef={headlineLeftRef} headlineRightRef={headlineRightRef} />
+        <Scene onAnimUpdate={setAnimState} />
       </Canvas>
       <div className="cube-overlay cube-overlay--left">
-        <h2 className="cube-headline" ref={headlineLeftRef} style={{ opacity: 1 }}>
-          Explore our platform
+        <h2 className="cube-headline">
+          <TypewriterText text="Explore our platform" trigger={animState.showLeft} speed={55} />
         </h2>
       </div>
       <div className="cube-overlay cube-overlay--right">
-        <h2 className="cube-headline" ref={headlineRightRef} style={{ opacity: 0 }}>
-          Everything in one place
+        <h2 className="cube-headline">
+          <TypewriterText text="Everything in one place" trigger={animState.showRight} speed={55} />
         </h2>
       </div>
     </div>

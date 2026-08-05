@@ -45,6 +45,15 @@
   text-wrap: balance;
 }
 
+.typewriter-cursor {
+  font-weight: 300;
+  animation: blink 0.7s step-end infinite;
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
 @media (max-width: 768px) {
   .cube-overlay {
     position: absolute;
