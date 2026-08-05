@@ -206,6 +206,31 @@ function WireframePulse({ animRef }) {
   );
 }
 
+/* ─── central cube (stays at center during all phases) ───────── */
+function CentralCube({ isDark }) {
+  const ref = useRef();
+
+  const mat = useMemo(
+    () =>
+      new THREE.MeshPhysicalMaterial({
+        color: new THREE.Color(isDark ? 0xffffff : 0x2ec4b6),
+        metalness: 0.05,
+        roughness: 0.32,
+        clearcoat: 0.4,
+        clearcoatRoughness: 0.2,
+        emissive: new THREE.Color(0x000000),
+        emissiveIntensity: 0,
+      }),
+    [isDark]
+  );
+
+  return (
+    <mesh ref={ref} material={mat}>
+      <boxGeometry args={[CUBE_SIZE, CUBE_SIZE, CUBE_SIZE]} />
+    </mesh>
+  );
+}
+
 /* ─── solid shell cube (covers sub-cubes when assembled) ── */
 function SolidShell({ animRef }) {
   const ref = useRef();
@@ -344,6 +369,7 @@ function Scene({ onAnimUpdate }) {
   const groupRef = useRef();
   const { camera } = useThree();
   const animRef = useAnimationMachine();
+  const isDark = useTheme();
   const lastShowRef = useRef({ showLeft: true, showRight: false });
   const dropRef = useRef({ t: 0, done: false });
 
@@ -413,9 +439,10 @@ function Scene({ onAnimUpdate }) {
       <directionalLight position={[5, 8, 5]} intensity={1.4} />
       <directionalLight position={[-4, 2, -3]} intensity={0.35} color="#88ccff" />
 
-      <Float speed={1.2} rotationIntensity={0.15} floatIntensity={0.2}>
-        <group ref={groupRef}>
-          {REST.map((pos, i) => (
+<Float speed={1.2} rotationIntensity={0.15} floatIntensity={0.2}>
+            <group ref={groupRef}>
+              <CentralCube isDark={isDark} />
+              {REST.map((pos, i) => (
             <FeatureCube
               key={i}
               index={i}
