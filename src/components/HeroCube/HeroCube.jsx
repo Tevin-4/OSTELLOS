@@ -1,4 +1,4 @@
-import React, { useRef, useMemo, useState, useEffect } from 'react';
+import React, { useRef, useMemo, useState, useEffect, useCallback } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Float, Html } from '@react-three/drei';
 import { EffectComposer, Bloom } from '@react-three/postprocessing';
@@ -18,21 +18,36 @@ function makePositions() {
 const REST = makePositions();
 const SPLIT = REST.map((p) => p.map((v) => v * SPLIT_MULT));
 
+/* ─── theme hook (read once, observe changes) ──────────── */
+function useTheme() {
+  const [isDark, setIsDark] = useState(
+    () => document.documentElement.getAttribute('data-theme') === 'dark'
+  );
+  useEffect(() => {
+    const el = document.documentElement;
+    const obs = new MutationObserver(() => {
+      setIsDark(el.getAttribute('data-theme') === 'dark');
+    });
+    obs.observe(el, { attributes: true, attributeFilter: ['data-theme'] });
+    return () => obs.disconnect();
+  }, []);
+  return isDark;
+}
+
 /* ─── single feature cube ───────────────────────────────── */
-function FeatureCube({ index, restPos, splitPos, accent, title, icon, phase, phaseProgress }) {
+function FeatureCube({ index, restPos, splitPos, accent, title, icon, animRef }) {
   const meshRef = useRef();
   const glowRef = useRef();
   const [showLabel, setShowLabel] = useState(false);
   const [hovered, setHovered] = useState(false);
+  const isDark = useTheme();
 
   const baseMat = useMemo(
     () =>
-      new THREE.MeshPhysicalMaterial({
+      new THREE.MeshStandardMaterial({
         color: new THREE.Color('#ffffff'),
         metalness: 0.05,
         roughness: 0.32,
-        clearcoat: 0.4,
-        clearcoatRoughness: 0.2,
         emissive: new THREE.Color(0x000000),
         emissiveIntensity: 0,
         transparent: true,
@@ -55,53 +70,41 @@ function FeatureCube({ index, restPos, splitPos, accent, title, icon, phase, pha
   useFrame(() => {
     if (!meshRef.current) return;
     const m = meshRef.current;
-    const isActive = phase === 'highlight' && phaseProgress.highlightIndex === index;
+    const { phase, highlightIndex } = animRef.current;
+    const isActive = phase === 'highlight' && highlightIndex === index;
     const isSplit = phase === 'split' || phase === 'highlight' || phase === 'pre-merge';
-    const isDimmed = phase === 'highlight' && phaseProgress.highlightIndex >= 0 && !isActive;
+    const isDimmed = phase === 'highlight' && highlightIndex >= 0 && !isActive;
 
-    // target position
     let tx, ty, tz;
     if (isActive) {
-      tx = splitPos[0];
-      ty = splitPos[1];
-      tz = splitPos[2] + 0.4;
+      tx = splitPos[0]; ty = splitPos[1]; tz = splitPos[2] + 0.4;
     } else if (isSplit) {
-      tx = splitPos[0];
-      ty = splitPos[1];
-      tz = splitPos[2];
+      tx = splitPos[0]; ty = splitPos[1]; tz = splitPos[2];
     } else {
-      tx = restPos[0];
-      ty = restPos[1];
-      tz = restPos[2];
+      tx = restPos[0]; ty = restPos[1]; tz = restPos[2];
     }
 
-    // lerp position
     const lerp = 0.08;
     m.position.x += (tx - m.position.x) * lerp;
     m.position.y += (ty - m.position.y) * lerp;
     m.position.z += (tz - m.position.z) * lerp;
 
-    // scale
     const ts = isActive ? 1.15 : hovered ? 1.1 : 1;
     m.scale.x += (ts - m.scale.x) * lerp;
     m.scale.y += (ts - m.scale.y) * lerp;
     m.scale.z += (ts - m.scale.z) * lerp;
 
-    // rotation
     const ry = isActive ? 0.18 : 0;
     m.rotation.y += (ry - m.rotation.y) * lerp;
 
-    // material — theme-aware base color
-    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
     const baseColor = isDark ? 0xffffff : 0x2ec4b6;
     const emphasized = isActive || hovered;
-
-    // when cubes are merged into one solid cube, render opaque so internal
-    // faces are hidden by depth-testing (no visible seams). when split, keep
-    // transparent for the dimming effect.
     const assembled = phase === 'idle' || phase === 'merge' || phase === 'fade' || phase === 'pause';
-    baseMat.transparent = !assembled;
-    if (assembled) baseMat.opacity = 1;
+
+    if (baseMat.transparent === assembled) {
+      baseMat.transparent = !assembled;
+    }
+    if (assembled && baseMat.opacity < 1) baseMat.opacity = 1;
 
     if (emphasized) {
       baseMat.color.setHex(baseColor);
@@ -118,13 +121,10 @@ function FeatureCube({ index, restPos, splitPos, accent, title, icon, phase, pha
       baseMat.opacity += (1 - baseMat.opacity) * 0.1;
     }
 
-    // glow
     glowMat.opacity += (((isActive || hovered) ? 0.14 : 0) - glowMat.opacity) * 0.1;
 
-    // label
     const wantLabel = isActive || hovered;
-    if (wantLabel && !showLabel) setShowLabel(true);
-    if (!wantLabel && showLabel) setShowLabel(false);
+    if (wantLabel !== showLabel) setShowLabel(wantLabel);
   });
 
   return (
@@ -133,14 +133,8 @@ function FeatureCube({ index, restPos, splitPos, accent, title, icon, phase, pha
         ref={meshRef}
         position={restPos}
         material={baseMat}
-        onPointerOver={(e) => {
-          e.stopPropagation();
-          setHovered(true);
-        }}
-        onPointerOut={(e) => {
-          e.stopPropagation();
-          setHovered(false);
-        }}
+        onPointerOver={(e) => { e.stopPropagation(); setHovered(true); }}
+        onPointerOut={(e) => { e.stopPropagation(); setHovered(false); }}
       >
         <boxGeometry args={[CUBE_SIZE, CUBE_SIZE, CUBE_SIZE]} />
         {showLabel && (
@@ -160,7 +154,7 @@ function FeatureCube({ index, restPos, splitPos, accent, title, icon, phase, pha
 }
 
 /* ─── connecting lines ──────────────────────────────────── */
-function ConnectLines({ phase }) {
+function ConnectLines({ animRef }) {
   const matRef = useRef();
 
   const geo = useMemo(() => {
@@ -173,6 +167,7 @@ function ConnectLines({ phase }) {
 
   useFrame(() => {
     if (!matRef.current) return;
+    const { phase } = animRef.current;
     const target = phase === 'highlight' || phase === 'split' ? 0.2 : 0;
     matRef.current.opacity += (target - matRef.current.opacity) * 0.08;
   });
@@ -185,12 +180,13 @@ function ConnectLines({ phase }) {
 }
 
 /* ─── wireframe pulse ───────────────────────────────────── */
-function WireframePulse({ phase }) {
+function WireframePulse({ animRef }) {
   const ref = useRef();
   const totalSize = (STEP * 2 + CUBE_SIZE) * 1.06;
 
   useFrame(() => {
     if (!ref.current) return;
+    const { phase } = animRef.current;
     const show = phase === 'fade' || phase === 'merge';
     const target = show ? 0.35 : 0;
     ref.current.material.opacity += (target - ref.current.material.opacity) * 0.1;
@@ -211,18 +207,17 @@ function WireframePulse({ phase }) {
 }
 
 /* ─── solid shell cube (covers sub-cubes when assembled) ── */
-function SolidShell({ phase }) {
+function SolidShell({ animRef }) {
   const ref = useRef();
   const shellSize = CUBE_SIZE * 2 * 1.02;
+  const isDark = useTheme();
 
   const mat = useMemo(
     () =>
-      new THREE.MeshPhysicalMaterial({
+      new THREE.MeshStandardMaterial({
         color: new THREE.Color('#ffffff'),
         metalness: 0.05,
         roughness: 0.32,
-        clearcoat: 0.4,
-        clearcoatRoughness: 0.2,
         emissive: new THREE.Color(0x000000),
         emissiveIntensity: 0,
         transparent: false,
@@ -233,9 +228,7 @@ function SolidShell({ phase }) {
 
   useFrame(() => {
     if (!ref.current) return;
-    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-    const baseColor = isDark ? 0xffffff : 0x2ec4b6;
-    mat.color.setHex(baseColor);
+    mat.color.setHex(isDark ? 0xffffff : 0x2ec4b6);
   });
 
   return (
@@ -279,9 +272,9 @@ function TypewriterText({ text, trigger, speed = 60 }) {
   return <span>{displayed}{typing && <span className="typewriter-cursor">|</span>}</span>;
 }
 
-/* ─── animation state machine ───────────────────────────── */
+/* ─── animation state machine (refs, not React state) ──── */
 function useAnimationMachine() {
-  const [state, setState] = useState({
+  const animRef = useRef({
     phase: 'idle',
     highlightIndex: -1,
     groupY: 0,
@@ -291,22 +284,21 @@ function useAnimationMachine() {
   const timerRef = useRef(0);
   const stepRef = useRef(0);
 
-  const PHASES = [
+  const PHASES = useMemo(() => [
     { name: 'intro',     duration: 2800 },
     { name: 'split',     duration: 900  },
-    { name: 'highlight', duration: 750 * 8, perCube: 750 },
+    { name: 'highlight', duration: 750 * FEATURES.length, perCube: 750 },
     { name: 'right',     duration: 2800 },
     { name: 'pre-merge', duration: 400  },
     { name: 'merge',     duration: 900  },
     { name: 'fade',      duration: 800  },
     { name: 'pause',     duration: 1000 },
-  ];
+  ], []);
 
   useFrame((_, delta) => {
     timerRef.current += delta * 1000;
-
+    const a = animRef.current;
     const phaseDef = PHASES[stepRef.current % PHASES.length];
-    const phaseName = phaseDef.name;
 
     if (timerRef.current >= phaseDef.duration) {
       timerRef.current = 0;
@@ -314,44 +306,43 @@ function useAnimationMachine() {
       const next = PHASES[stepRef.current % PHASES.length];
 
       if (next.name === 'intro') {
-        setState((s) => ({ ...s, phase: 'idle', highlightIndex: -1, groupY: 0, showLeft: true, showRight: false }));
+        Object.assign(a, { phase: 'idle', highlightIndex: -1, groupY: 0, showLeft: true, showRight: false });
       } else if (next.name === 'split') {
-        setState((s) => ({ ...s, phase: 'split', groupY: 0.15, showLeft: true, showRight: false }));
+        Object.assign(a, { phase: 'split', groupY: 0.15, showLeft: true, showRight: false });
       } else if (next.name === 'highlight') {
-        setState((s) => ({ ...s, phase: 'highlight', highlightIndex: 0, showLeft: true, showRight: false }));
+        Object.assign(a, { phase: 'highlight', highlightIndex: 0, showLeft: true, showRight: false });
       } else if (next.name === 'right') {
-        setState((s) => ({ ...s, phase: 'right', showLeft: true, showRight: true }));
+        Object.assign(a, { phase: 'right', showLeft: true, showRight: true });
       } else if (next.name === 'pre-merge') {
-        setState((s) => ({ ...s, phase: 'pre-merge', highlightIndex: -1, showLeft: true, showRight: true }));
+        Object.assign(a, { phase: 'pre-merge', highlightIndex: -1, showLeft: true, showRight: true });
       } else if (next.name === 'merge') {
-        setState((s) => ({ ...s, phase: 'merge', groupY: 0, showLeft: true, showRight: true }));
+        Object.assign(a, { phase: 'merge', groupY: 0, showLeft: true, showRight: true });
       } else if (next.name === 'fade') {
-        setState((s) => ({ ...s, phase: 'fade', showLeft: false, showRight: false }));
+        Object.assign(a, { phase: 'fade', showLeft: false, showRight: false });
       } else if (next.name === 'pause') {
-        setState((s) => ({ ...s, phase: 'pause', showLeft: false, showRight: false }));
+        Object.assign(a, { phase: 'pause', showLeft: false, showRight: false });
       }
     }
 
-    // within highlight phase, advance index
-    if (phaseName === 'highlight') {
+    if (phaseDef.name === 'highlight') {
       const idx = Math.floor(timerRef.current / phaseDef.perCube);
-      if (idx !== state.highlightIndex && idx < 8) {
-        setState((s) => ({ ...s, highlightIndex: idx }));
+      if (idx !== a.highlightIndex && idx < FEATURES.length) {
+        a.highlightIndex = idx;
       }
     }
   });
 
-  return state;
+  return animRef;
 }
 
 /* ─── scene internals ───────────────────────────────────── */
 function Scene({ onAnimUpdate }) {
   const groupRef = useRef();
   const { camera } = useThree();
-  const anim = useAnimationMachine();
+  const animRef = useAnimationMachine();
+  const lastShowRef = useRef({ showLeft: true, showRight: false });
 
   const GROUP_Y_OFFSET = 0.35;
-  const GROUP_X_OFFSET = 0;
 
   useEffect(() => {
     const isMobile = window.innerWidth <= 768;
@@ -364,35 +355,31 @@ function Scene({ onAnimUpdate }) {
     }
   }, [camera]);
 
-  useEffect(() => {
-    onAnimUpdate?.({ showLeft: anim.showLeft, showRight: anim.showRight });
-  }, [anim.showLeft, anim.showRight]);
-
-  /* mouse parallax + group Y position */
   useFrame(({ pointer }) => {
     if (!groupRef.current) return;
 
-    // parallax — strong follow
     const targetRY = 0.35 + pointer.x * 0.5;
     const targetRX = 0.12 + pointer.y * 0.4;
     groupRef.current.rotation.y += (targetRY - groupRef.current.rotation.y) * 0.12;
     groupRef.current.rotation.x += (targetRX - groupRef.current.rotation.x) * 0.12;
 
-    // group Y — base offset plus animation target
-    const targetY = GROUP_Y_OFFSET + anim.groupY;
+    const targetY = GROUP_Y_OFFSET + animRef.current.groupY;
     groupRef.current.position.y += (targetY - groupRef.current.position.y) * 0.06;
-    // group X — slight right offset
-    groupRef.current.position.x += (GROUP_X_OFFSET - groupRef.current.position.x) * 0.04;
+
+    const { showLeft, showRight } = animRef.current;
+    if (showLeft !== lastShowRef.current.showLeft || showRight !== lastShowRef.current.showRight) {
+      lastShowRef.current = { showLeft, showRight };
+      onAnimUpdate?.({ showLeft, showRight });
+    }
   });
+
+  const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
 
   return (
     <>
       <ambientLight intensity={0.7} />
       <hemisphereLight args={['#ffffff', '#3a4a3a', 0.3]} />
-      <directionalLight
-        position={[5, 8, 5]}
-        intensity={1.4}
-      />
+      <directionalLight position={[5, 8, 5]} intensity={1.4} />
       <directionalLight position={[-4, 2, -3]} intensity={0.35} color="#88ccff" />
 
       <Float speed={1.2} rotationIntensity={0.15} floatIntensity={0.2}>
@@ -406,19 +393,20 @@ function Scene({ onAnimUpdate }) {
               accent={FEATURES[i].color}
               title={FEATURES[i].title}
               icon={FEATURES[i].icon}
-              phase={anim.phase}
-              phaseProgress={{ highlightIndex: anim.highlightIndex }}
+              animRef={animRef}
             />
           ))}
-          <ConnectLines phase={anim.phase} />
-          <WireframePulse phase={anim.phase} />
-          <SolidShell phase={anim.phase} />
+          <ConnectLines animRef={animRef} />
+          <WireframePulse animRef={animRef} />
+          <SolidShell animRef={animRef} />
         </group>
       </Float>
 
-      <EffectComposer>
-        <Bloom luminanceThreshold={0.6} luminanceSmoothing={0.9} intensity={0.5} />
-      </EffectComposer>
+      {!isMobile && (
+        <EffectComposer>
+          <Bloom luminanceThreshold={0.6} luminanceSmoothing={0.9} intensity={0.5} />
+        </EffectComposer>
+      )}
     </>
   );
 }
