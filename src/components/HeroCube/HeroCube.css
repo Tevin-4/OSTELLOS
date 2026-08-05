@@ -63,7 +63,7 @@
   }
 
   .cube-overlay--left {
-    top: 6%;
+    top: 15%;
     left: 0;
     right: 0;
     transform: none;
@@ -71,7 +71,7 @@
 
   .cube-overlay--right {
     top: auto;
-    bottom: 6%;
+    bottom: 10%;
     left: 0;
     right: 0;
     transform: none;

@@ -5,10 +5,11 @@ function initNavPill() {
   if (!nav) return;
   const onScroll = () => {
     const y = window.scrollY;
-    const start = 40;
-    const end = 120;
+    const start = 10;
+    const end = 100;
     const progress = Math.min(1, Math.max(0, (y - start) / (end - start)));
-    nav.style.setProperty('--nav-pill', progress);
+    const ease = progress * progress * (3 - 2 * progress);
+    nav.style.setProperty('--pill', ease);
     nav.classList.toggle('nav--scrolled', progress > 0);
   };
   window.addEventListener('scroll', onScroll, { passive: true });
