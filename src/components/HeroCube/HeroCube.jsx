@@ -72,7 +72,7 @@ function FeatureCube({ index, restPos, splitPos, accent, title, icon, animRef })
     const m = meshRef.current;
     const { phase, highlightIndex } = animRef.current;
     const isActive = phase === 'highlight' && highlightIndex === index;
-    const isSplit = phase === 'split' || phase === 'highlight' || phase === 'pre-merge';
+    const isSplit = phase === 'split' || phase === 'highlight' || phase === 'right' || phase === 'pre-merge';
     const isDimmed = phase === 'highlight' && highlightIndex >= 0 && !isActive;
 
     let tx, ty, tz;
@@ -367,14 +367,14 @@ function Scene({ onAnimUpdate }) {
     const drop = dropRef.current;
     if (!drop.done) {
       drop.t += delta;
-      const dur = 1.2;
+      const dur = 1.5;
       const progress = Math.min(drop.t / dur, 1);
       // Elastic ease out
       const p = progress;
       const elastic = p === 1 ? 1 : Math.pow(2, -10 * p) * Math.sin((p * 10 - 0.75) * ((2 * Math.PI) / 3)) + 1;
-      const dropY = 5 * (1 - elastic);
-      const dropScale = 0.3 + 0.7 * elastic;
-      const dropRotX = -0.5 * (1 - elastic);
+      const dropY = 8 * (1 - elastic);
+      const dropScale = 0.2 + 0.8 * elastic;
+      const dropRotX = -0.8 * (1 - elastic);
 
       groupRef.current.position.y = GROUP_Y_OFFSET + dropY + animRef.current.groupY;
       groupRef.current.scale.setScalar(dropScale);
@@ -384,6 +384,7 @@ function Scene({ onAnimUpdate }) {
         drop.done = true;
         groupRef.current.scale.setScalar(1);
         groupRef.current.rotation.x = 0;
+        groupRef.current.position.y = GROUP_Y_OFFSET + animRef.current.groupY;
       }
     } else {
       // Normal animation
