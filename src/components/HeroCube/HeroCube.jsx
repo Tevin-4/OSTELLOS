@@ -220,8 +220,6 @@ function SolidShell({ animRef }) {
         roughness: 0.32,
         emissive: new THREE.Color(0x000000),
         emissiveIntensity: 0,
-        transparent: true,
-        opacity: 1,
       }),
     []
   );
@@ -230,9 +228,10 @@ function SolidShell({ animRef }) {
     if (!ref.current) return;
     const { phase } = animRef.current;
     const assembled = phase === 'idle' || phase === 'merge' || phase === 'fade' || phase === 'pause';
-    const targetOpacity = assembled ? 1 : 0;
-    mat.opacity += (targetOpacity - mat.opacity) * 0.18;
-    mat.transparent = mat.opacity < 0.99;
+    const targetScale = assembled ? 1 : 0;
+    const s = ref.current.scale.x;
+    const next = s + (targetScale - s) * 0.15;
+    ref.current.scale.setScalar(next);
     mat.color.setHex(isDark ? 0xffffff : 0x2ec4b6);
   });
 
@@ -361,7 +360,7 @@ function Scene({ onAnimUpdate }) {
     }
   }, [camera]);
 
-  useFrame(({ pointer }) => {
+  useFrame(({ pointer }, delta) => {
     if (!groupRef.current) return;
 
     // Drop-in entrance animation
