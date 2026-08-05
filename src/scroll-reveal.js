@@ -4,7 +4,12 @@ function initNavPill() {
   const nav = document.querySelector('.nav');
   if (!nav) return;
   const onScroll = () => {
-    nav.classList.toggle('nav--scrolled', window.scrollY > 60);
+    const y = window.scrollY;
+    const start = 40;
+    const end = 120;
+    const progress = Math.min(1, Math.max(0, (y - start) / (end - start)));
+    nav.style.setProperty('--nav-pill', progress);
+    nav.classList.toggle('nav--scrolled', progress > 0);
   };
   window.addEventListener('scroll', onScroll, { passive: true });
   onScroll();
