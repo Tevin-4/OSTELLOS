@@ -1,5 +1,15 @@
 const DECRYPT_CHARS = '!@#$%^&*()_+-=[]{}|;:<>?/~`0123456789';
 
+function initNavPill() {
+  const nav = document.querySelector('.nav');
+  if (!nav) return;
+  const onScroll = () => {
+    nav.classList.toggle('nav--scrolled', window.scrollY > 60);
+  };
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+}
+
 function decryptText(el) {
   const final = el.dataset.decryptText || el.textContent;
   const duration = 1200;
@@ -66,4 +76,6 @@ export function initScrollReveal() {
   );
 
   decryptEls.forEach((el) => ioDecrypt.observe(el));
+
+  initNavPill();
 }

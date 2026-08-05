@@ -49,6 +49,7 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
+  padding-top: var(--nav-h);
 }
 
 img, svg { display: block; max-width: 100%; }
@@ -96,12 +97,24 @@ ul { list-style: none; }
 
 /* ── Nav ──────────────────────────────────────────────────────────────── */
 .nav {
-  position: sticky; top: 0; z-index: 50;
+  position: fixed; top: 0; left: 0; right: 0; z-index: 50;
   height: var(--nav-h);
   background: rgba(250, 251, 252, 0.88);
   backdrop-filter: blur(14px) saturate(1.4);
   -webkit-backdrop-filter: blur(14px) saturate(1.4);
   border-bottom: 1px solid var(--border);
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 0;
+}
+.nav--scrolled {
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(92%, 720px);
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  background: rgba(250, 251, 252, 0.92);
 }
 .nav-inner {
   max-width: var(--max-w); margin: 0 auto; height: 100%;
@@ -148,6 +161,7 @@ ul { list-style: none; }
 .hero {
   position: relative; max-width: var(--max-w); margin: 0 auto;
   height: 85vh; min-height: 520px; max-height: 720px;
+  margin-top: calc(-1 * var(--nav-h));
 }
 
 /* Ambient blobs */

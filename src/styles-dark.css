@@ -67,6 +67,10 @@
   background: rgba(11, 17, 32, 0.92);
   border-color: var(--border);
 }
+[data-theme="dark"] .nav--scrolled {
+  background: rgba(11, 17, 32, 0.94);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+}
 
 [data-theme="dark"] .bento-cell,
 [data-theme="dark"] .testi {
