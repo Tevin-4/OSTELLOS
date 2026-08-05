@@ -93,7 +93,7 @@ function FeatureCube({ index, restPos, splitPos, accent, title, icon, phase, pha
 
     // material — theme-aware base color
     const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-    const baseColor = isDark ? 0xffffff : 0x2ec4b6;
+    const baseColor = isDark ? 0xffffff : 0x0891B2;
     const emphasized = isActive || hovered;
 
     // when cubes are merged into one solid cube, render opaque so internal
@@ -205,7 +205,7 @@ function WireframePulse({ phase }) {
   return (
     <mesh ref={ref}>
       <boxGeometry args={[totalSize, totalSize, totalSize]} />
-      <meshBasicMaterial color="#2ec4b6" wireframe transparent opacity={0} />
+      <meshBasicMaterial color="#0891B2" wireframe transparent opacity={0} />
     </mesh>
   );
 }
@@ -234,7 +234,7 @@ function SolidShell({ phase }) {
   useFrame(() => {
     if (!ref.current) return;
     const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-    const baseColor = isDark ? 0xffffff : 0x2ec4b6;
+    const baseColor = isDark ? 0xffffff : 0x0891B2;
     mat.color.setHex(baseColor);
   });
 
