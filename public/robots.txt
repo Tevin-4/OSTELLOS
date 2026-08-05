@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://ostellosms.com/sitemap.xml
