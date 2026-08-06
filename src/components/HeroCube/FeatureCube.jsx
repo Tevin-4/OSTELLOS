@@ -14,17 +14,20 @@ function FeatureCube({ index, restPos, splitPos, accent, title, icon, animRef })
   const isDark = useTheme();
 
   const baseMat = useMemo(
-    () =>
-      new THREE.MeshStandardMaterial({
-        color: new THREE.Color('#ffffff'),
+    () => {
+      const material = new THREE.MeshStandardMaterial({
+        color: new THREE.Color(isDark ? 0xffffff : 0x2ec4b6),
         metalness: 0.05,
         roughness: 0.32,
         emissive: new THREE.Color(0x000000),
         emissiveIntensity: 0,
         transparent: true,
         opacity: 1,
-      }),
-    []
+      });
+      material.needsUpdate = true;
+      return material;
+    },
+    [isDark]
   );
 
   const glowMat = useMemo(

@@ -5,7 +5,9 @@ import { Float } from '@react-three/drei';
 import { EffectComposer, Bloom } from '@react-three/postprocessing';
 import * as THREE from 'three';
 import { FEATURES, CUBE_SIZE, STEP, SPLIT_MULT } from './FeatureConfig';
+import { useTheme } from '../../ThemeProvider.jsx';
 import FeatureCube from './FeatureCube';
+import './HeroCube.css';
 import './HeroCube.css';
 
 function supportsBloom() {
@@ -93,17 +95,16 @@ function WireframePulse({ animRef }) {
 
 function CentralCube({ isDark }) {
   const ref = useRef();
-  const color = isDark ? 0xffffff : 0x2ec4b6;
   const mat = useMemo(
     () =>
       new THREE.MeshPhysicalMaterial({
-        color: new THREE.Color(color),
+        color: new THREE.Color(0xff0000),
         metalness: 0.05,
         roughness: 0.32,
         clearcoat: 0.4,
         clearcoatRoughness: 0.2,
       }),
-    [color]
+    []
   );
   return (
     <mesh ref={ref} material={mat}>
@@ -116,15 +117,19 @@ function SolidShell({ animRef }) {
   const ref = useRef();
   const shellSize = CUBE_SIZE * 2 * 1.02;
   const isDark = useTheme();
+
   const mat = useMemo(
     () =>
       new THREE.MeshStandardMaterial({
-        color: new THREE.Color(isDark ? 0xffffff : 0x2ec4b6),
+        color: new THREE.Color(isDark ? 0xffffff : 0xff0000),
         metalness: 0.05,
         roughness: 0.32,
+        emissive: new THREE.Color(0x000000),
+        emissiveIntensity: 0,
       }),
     [isDark]
   );
+
   useFrame(() => {
     if (!ref.current) return;
     const { phase } = animRef.current;
@@ -132,7 +137,9 @@ function SolidShell({ animRef }) {
     const targetScale = assembled ? 1 : 0;
     const s = ref.current.scale.x;
     ref.current.scale.setScalar(s + (targetScale - s) * 0.15);
+    mat.color.setHex(isDark ? 0xffffff : 0xff0000);
   });
+
   return (
     <mesh ref={ref} material={mat}>
       <boxGeometry args={[shellSize, shellSize, shellSize]} />
