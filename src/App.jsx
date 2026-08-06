@@ -1,11 +1,15 @@
 import { lazy, Suspense } from 'react';
+import { ThemeProvider } from './ThemeProvider';
+import { initScrollReveal } from './scroll-reveal';
 
 const HeroCube = lazy(() => import('./components/HeroCube'));
 
 export default function App() {
   return (
-    <Suspense fallback={null}>
-      <HeroCube />
-    </Suspense>
+    <ThemeProvider>
+      <Suspense fallback={null}>
+        <HeroCube />
+      </Suspense>
+    </ThemeProvider>
   );
 }

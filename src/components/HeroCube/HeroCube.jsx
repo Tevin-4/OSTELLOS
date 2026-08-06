@@ -1,10 +1,25 @@
 import { useRef, useMemo, useState, useEffect } from 'react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { Canvas, useFrame, useThree, extend } from '@react-three/fiber';
 import { Float, Html } from '@react-three/drei';
 import { EffectComposer, Bloom } from '@react-three/postprocessing';
 import * as THREE from 'three';
 import { FEATURES, CUBE_SIZE, STEP, SPLIT_MULT } from './FeatureConfig';
 import './HeroCube.css';
+import { useTheme } from '../ThemeProvider';
+
+/* ─── WebGL feature detection ────────────────────── */
+function supportsBloom() {
+  try {
+    const canvas = document.createElement('canvas');
+    const gl = canvas.getContext('webgl2') || canvas.getContext('webgl');
+    if (!gl) return false;
+    const ext = gl.getExtension('OES_texture_float');
+    if (!ext) return false;
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 /* ─── 2×2×2 grid positions, centered ────────────────────── */
 function makePositions() {
@@ -43,22 +58,6 @@ const ANIMATION_CONFIG = {
     wireframe: 0x0891b2,
   },
 };
-
-/* ─── theme hook (read once, observe changes) ──────────── */
-function useTheme() {
-  const [isDark, setIsDark] = useState(
-    () => document.documentElement.getAttribute('data-theme') === 'dark'
-  );
-  useEffect(() => {
-    const el = document.documentElement;
-    const obs = new MutationObserver(() => {
-      setIsDark(el.getAttribute('data-theme') === 'dark');
-    });
-    obs.observe(el, { attributes: true, attributeFilter: ['data-theme'] });
-    return () => obs.disconnect();
-  }, []);
-  return isDark;
-}
 
 /* ─── single feature cube ───────────────────────────────── */
 function FeatureCube({ index, restPos, splitPos, accent, title, icon, animRef }) {
@@ -486,7 +485,7 @@ function Scene({ onAnimUpdate }) {
         </group>
       </Float>
 
-      {!isMobile && (
+      {(!isMobile && supportsBloom()) && (
         <EffectComposer>
           <Bloom luminanceThreshold={0.6} luminanceSmoothing={0.9} intensity={0.5} />
         </EffectComposer>
