@@ -1,6 +1,5 @@
 import { lazy, Suspense } from 'react';
-import { ThemeProvider } from './ThemeProvider';
-import { initScrollReveal } from './scroll-reveal';
+import ThemeProvider from './ThemeProvider';
 
 const HeroCube = lazy(() => import('./components/HeroCube'));
 
