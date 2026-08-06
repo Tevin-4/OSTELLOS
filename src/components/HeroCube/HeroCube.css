@@ -30,6 +30,20 @@
   text-align: left;
 }
 
+.cube-overlay--center {
+  left: 50%;
+  bottom: 24px;
+  top: auto;
+  transform: translateX(-50%);
+  width: auto;
+  text-align: center;
+  padding: 0 24px;
+}
+
+.cube-overlay--center .cube-headline {
+  white-space: nowrap;
+}
+
 .cube-overlay--right .cube-headline {
   white-space: nowrap;
 }
@@ -83,39 +97,64 @@
     text-align: center;
   }
 
+  .cube-overlay--center {
+    bottom: 16px;
+    left: 0;
+    right: 0;
+    transform: none;
+    width: 100%;
+  }
+
+  .cube-overlay--center .cube-headline {
+    white-space: normal;
+    text-align: center;
+    font-size: clamp(22px, 6vw, 32px);
+  }
+
   .cube-headline {
     font-size: clamp(26px, 7vw, 40px);
   }
 }
 
-.r3f-label {
+.hero-feature-display {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  padding: 6px 13px;
+  gap: 8px;
+  padding: 8px 18px;
   white-space: nowrap;
   font-family: 'Outfit', sans-serif;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
-  color: #1e293b;
+  color: var(--text);
   background: rgba(255, 255, 255, 0.94);
   border: 1px solid rgba(0, 0, 0, 0.06);
   border-radius: 999px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.10);
   backdrop-filter: blur(6px);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  opacity: 0;
+  animation: feature-fade-in 0.3s ease forwards;
 }
 
-.r3f-label i {
-  font-size: 14px;
+.hero-feature-display i {
+  font-size: 15px;
+  color: var(--accent);
 }
 
-[data-theme="dark"] .r3f-label {
+[data-theme="dark"] .hero-feature-display {
   color: #e2e8f0;
   background: rgba(15, 23, 42, 0.92);
   border-color: rgba(255, 255, 255, 0.08);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+@keyframes feature-fade-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(6px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
 
 [data-theme="dark"] .cube-headline {

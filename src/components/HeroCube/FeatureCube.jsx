@@ -1,17 +1,16 @@
 import { useRef, useMemo, useState, useEffect } from 'react';
 import * as THREE from 'three';
-import { Html } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import { useTheme } from '../../ThemeProvider.jsx';
 import { CUBE_SIZE } from './FeatureConfig';
 import './FeatureCube.css';
 
-function FeatureCube({ index, restPos, splitPos, accent, title, icon, animRef }) {
+function FeatureCube({ index, restPos, splitPos, accent, title, icon, animRef, onAnimationChange, onUserHover }) {
   const meshRef = useRef();
   const glowRef = useRef();
-  const [showLabel, setShowLabel] = useState(false);
   const [hovered, setHovered] = useState(false);
   const isDark = useTheme();
+  const prevIsActiveRef = useRef(false);
 
   const baseMat = useMemo(
     () => {
@@ -104,8 +103,11 @@ function FeatureCube({ index, restPos, splitPos, accent, title, icon, animRef })
 
     glowMat.opacity += (((isActive || hovered) ? 0.14 : 0) - glowMat.opacity) * 0.1;
 
-    const wantLabel = isActive || hovered;
-    if (wantLabel !== showLabel) setShowLabel(wantLabel);
+    const wantNotify = isActive || hovered;
+    if (wantNotify !== prevIsActiveRef.current) {
+      prevIsActiveRef.current = wantNotify;
+      onAnimationChange?.(wantNotify ? index : null);
+    }
   });
 
   return (
@@ -114,18 +116,10 @@ function FeatureCube({ index, restPos, splitPos, accent, title, icon, animRef })
         ref={meshRef}
         position={restPos}
         material={baseMat}
-        onPointerOver={(e) => { e.stopPropagation(); setHovered(true); }}
-        onPointerOut={(e) => { e.stopPropagation(); setHovered(false); }}
+        onPointerOver={(e) => { e.stopPropagation(); setHovered(true); onUserHover?.(index); }}
+        onPointerOut={(e) => { e.stopPropagation(); setHovered(false); onUserHover?.(null); }}
       >
         <boxGeometry args={[CUBE_SIZE, CUBE_SIZE, CUBE_SIZE]} />
-        {showLabel && (
-          <Html position={[CUBE_SIZE * 2.2, CUBE_SIZE * 0.5, 0]} center distanceFactor={6} style={{ pointerEvents: 'none' }}>
-            <div className="r3f-label">
-              <i className={`ph ph-${icon}`}></i>
-              <span>{title}</span>
-            </div>
-          </Html>
-        )}
       </mesh>
       <mesh ref={glowRef} position={restPos} material={glowMat} scale={1.18}>
         <boxGeometry args={[CUBE_SIZE, CUBE_SIZE, CUBE_SIZE]} />

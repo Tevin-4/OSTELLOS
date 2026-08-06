@@ -1,5 +1,5 @@
 /* ─── HeroCube.jsx ────────────────────────────── */
-import { useRef, useMemo, useState, useEffect } from 'react';
+import { useRef, useMemo, useState, useEffect, useCallback } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Float } from '@react-three/drei';
 import { EffectComposer, Bloom } from '@react-three/postprocessing';
@@ -7,7 +7,6 @@ import * as THREE from 'three';
 import { FEATURES, CUBE_SIZE, STEP, SPLIT_MULT } from './FeatureConfig';
 import { useTheme } from '../../ThemeProvider.jsx';
 import FeatureCube from './FeatureCube';
-import './HeroCube.css';
 import './HeroCube.css';
 
 function supportsBloom() {
@@ -228,12 +227,12 @@ function useAnimationMachine() {
   return animRef;
 }
 
-function Scene({ onAnimUpdate }) {
+function Scene({ onAnimUpdate, onAnimationChange, onUserHover }) {
   const groupRef = useRef();
   const { camera } = useThree();
   const animRef = useAnimationMachine();
   const isDark = useTheme();
-  const lastShowRef = useRef({ showLeft: true, showRight: false });
+  const lastShowRef = useRef({ showLeft: true, showRight: false, highlightIndex: -1 });
   const dropRef = useRef({ t: 0, done: false });
   const GROUP_Y_OFFSET = 0.35;
 
@@ -269,10 +268,10 @@ function Scene({ onAnimUpdate }) {
       groupRef.current.rotation.x += (0.12 + pointer.y * 0.4 - groupRef.current.rotation.x) * ANIMATION_CONFIG.lerp.rotation;
       groupRef.current.position.y += (GROUP_Y_OFFSET + animRef.current.groupY - groupRef.current.position.y) * ANIMATION_CONFIG.lerp.group;
     }
-    const { showLeft, showRight } = animRef.current;
-    if (showLeft !== lastShowRef.current.showLeft || showRight !== lastShowRef.current.showRight) {
-      lastShowRef.current = { showLeft, showRight };
-      onAnimUpdate?.({ showLeft, showRight });
+    const { showLeft, showRight, highlightIndex, phase } = animRef.current;
+    if (showLeft !== lastShowRef.current.showLeft || showRight !== lastShowRef.current.showRight || highlightIndex !== lastShowRef.current.highlightIndex || phase !== lastShowRef.current.phase) {
+      lastShowRef.current = { showLeft, showRight, highlightIndex, phase };
+      onAnimUpdate?.({ showLeft, showRight, highlightIndex, phase });
     }
   });
 
@@ -288,7 +287,7 @@ function Scene({ onAnimUpdate }) {
         <group ref={groupRef}>
           <CentralCube isDark={isDark} />
           {REST.map((pos, i) => (
-            <FeatureCube key={i} index={i} restPos={pos} splitPos={SPLIT[i]} accent={FEATURES[i].color} title={FEATURES[i].title} icon={FEATURES[i].icon} animRef={animRef} />
+            <FeatureCube key={i} index={i} restPos={pos} splitPos={SPLIT[i]} accent={FEATURES[i].color} title={FEATURES[i].title} icon={FEATURES[i].icon} animRef={animRef} onAnimationChange={onAnimationChange} onUserHover={onUserHover} />
           ))}
           <ConnectLines animRef={animRef} />
           <WireframePulse animRef={animRef} />
@@ -306,18 +305,50 @@ function Scene({ onAnimUpdate }) {
 
 export default function HeroCube() {
   const [animState, setAnimState] = useState({ showLeft: true, showRight: false });
+  const [animationFeature, setAnimationFeature] = useState(null);
+  const [userHoveredFeature, setUserHoveredFeature] = useState(null);
+  const [isIdle, setIsIdle] = useState(false);
+  const [joinTrigger, setJoinTrigger] = useState(false);
+
+  const handleAnimationChange = useCallback((index) => {
+    setAnimationFeature(index);
+  }, []);
+
+  const handleUserHover = useCallback((index) => {
+    setUserHoveredFeature(index);
+  }, []);
+
+  const handleAnimUpdate = useCallback(({ showLeft, showRight, highlightIndex, phase }) => {
+    setAnimState({ showLeft, showRight });
+    setAnimationFeature(highlightIndex >= 0 ? highlightIndex : null);
+    const showJoin = phase === 'pre-merge' || phase === 'merge';
+    setIsIdle(showJoin);
+    setJoinTrigger(showJoin);
+  }, []);
+
+  const displayFeature = userHoveredFeature !== null ? userHoveredFeature : animationFeature;
 
   return (
     <div className="hero-cube-wrap">
       <Canvas dpr={[1, 1.5]} gl={{ antialias: true, alpha: true }} camera={{ fov: 35, near: 0.1, far: 100 }} style={{ background: 'transparent' }}>
-        <Scene onAnimUpdate={setAnimState} />
+        <Scene onAnimUpdate={handleAnimUpdate} onAnimationChange={handleAnimationChange} onUserHover={handleUserHover} />
       </Canvas>
       <div className="cube-overlay cube-overlay--left">
-        <h2 className="cube-headline"><TypewriterText text="Explore our platform" trigger={animState.showLeft} speed={55} /></h2>
+        <h2 className="cube-headline"><TypewriterText text="Explore our platform" trigger={animState.showLeft} speed={80} /></h2>
       </div>
       <div className="cube-overlay cube-overlay--right">
-        <h2 className="cube-headline"><TypewriterText text="Everything in one place" trigger={animState.showRight} speed={55} /></h2>
+        <h2 className="cube-headline"><TypewriterText text="Everything in one place" trigger={animState.showRight} speed={80} /></h2>
       </div>
+      {isIdle ? (
+        <div className="cube-overlay cube-overlay--center" key="join">
+          <h2 className="cube-headline"><TypewriterText text="Join Ostellos" trigger={joinTrigger} speed={80} /></h2>
+        </div>
+      ) : displayFeature !== null ? (
+        <div className="hero-feature-display" key={displayFeature}>
+          <i className={`ph ph-${FEATURES[displayFeature].icon}`}></i>
+          <span>{FEATURES[displayFeature].title}</span>
+        </div>
+      ) : null}
     </div>
   );
 }

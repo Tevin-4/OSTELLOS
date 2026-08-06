@@ -45,7 +45,7 @@
   <link rel="stylesheet" href="src/styles-dark.css" id="dark-theme-link" disabled>
   <script type="module" src="src/main.jsx"></script>
   
-  <link rel="preload" as="image" href="logo.png" />
+  <link rel="preload" as="image" href="/hero.png" />
   <link rel="icon" href="logo.png">
 </head>
 <body>
@@ -90,20 +90,26 @@
       </div>
     </section>
 
-    <!-- ── Intro copy (moved from hero) ──────────────────────────────────── -->
-    <section class="intro-copy" data-reveal>
-      <h1 class="hero-title">Run every hostel operation from one dashboard</h1>
-      <p class="hero-sub" data-reveal data-reveal-delay="80">Rooms, bookings, payments, maintenance, and visitors across all your halls. Self-hosted, secure, built for modern hospitality.</p>
-      <div class="hero-ctas" data-reveal data-reveal-delay="160">
-        <a class="btn btn-primary btn-lg" href="#contact">Contact us</a>
-        <a class="btn btn-ghost btn-lg" href="#features">See how it works</a>
+    <!-- ── Hero Image Section ───────────────────────────────────────────── -->
+    <section class="hero-image-section">
+      <div class="hero-image-bg" aria-hidden="true">
+        <img src="/hero.png" alt="Ostellos MS campus" class="hero-image-img" />
       </div>
-      <ul class="hero-meta" data-reveal data-reveal-delay="240">
-        <li><i class="ph ph-check"></i> Self-hosted, pay only for your infrastructure</li>
-        <li><i class="ph ph-check"></i> Multi-hall</li>
-        <li><i class="ph ph-check"></i> 2FA for staff</li>
-      </ul>
+      <div class="hero-image-content">
+        <h1 class="hero-title">Run every hostel operation from one dashboard</h1>
+        <p class="hero-sub">Rooms, bookings, payments, maintenance, and visitors across all your halls. Self-hosted, secure, built for modern hospitality.</p>
+        <div class="hero-ctas">
+          <a class="btn btn-primary btn-lg" href="#contact">Get in touch</a>
+          <a class="btn btn-ghost btn-lg" href="#features">See how it works</a>
+        </div>
+        <ul class="hero-meta">
+          <li><i class="ph ph-check"></i> Self-hosted, pay only for your infrastructure</li>
+          <li><i class="ph ph-check"></i> Multi-hall</li>
+          <li><i class="ph ph-check"></i> 2FA for staff</li>
+        </ul>
+      </div>
     </section>
+
 
     <!-- ── Capability ticker ─────────────────────────────────────────────── -->
     <section class="ticker" aria-label="Capabilities" data-reveal>

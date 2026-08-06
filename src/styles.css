@@ -172,6 +172,84 @@ ul { list-style: none; }
   margin-top: calc(-1 * var(--nav-h));
 }
 
+.hero-visual {
+  position: absolute; inset: 0; z-index: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* Hero Image Section - after cube */
+.hero-image-section {
+  position: relative;
+  width: 100%;
+  min-height: 50vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  overflow: hidden;
+  padding: 40px 24px 0;
+}
+
+.hero-image-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    circle at center,
+    rgba(255, 255, 255, 1) 0%,
+    rgba(255, 255, 255, 0.95) 25%,
+    rgba(255, 255, 255, 0.4) 55%,
+    rgba(255, 255, 255, 0.0) 75%,
+    rgba(255, 255, 255, 0.0) 100%
+  );
+}
+
+.hero-image-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  opacity: 1;
+}
+
+.hero-image-content {
+  position: relative;
+  z-index: 2;
+  max-width: 800px;
+  padding: 0 24px;
+}
+
+.hero-image-content .hero-title {
+  font-size: clamp(38px, 5.2vw, 62px);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1.02;
+  max-width: 13ch;
+  margin: 0 auto;
+  text-wrap: balance;
+}
+
+.hero-image-content .hero-sub {
+  margin-top: 22px;
+  font-size: 17.5px;
+  color: var(--text-2);
+  max-width: 44ch;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.65;
+}
+
+.hero-image-content .hero-ctas {
+  margin-top: 34px;
+  justify-content: center;
+}
+
+.hero-image-content .hero-meta {
+  margin-top: 30px;
+  justify-content: center;
+}
+
 /* Ambient blobs */
 .hero-ambient {
   position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden;
@@ -194,12 +272,7 @@ ul { list-style: none; }
   100% { transform: translate(40px, -30px) scale(1.15); }
 }
 
-.hero-visual {
-  position: absolute; inset: 0; z-index: 0;
-  display: flex; align-items: center; justify-content: center;
-}
-
-/* Shared text styles */
+/* Ambient blobs */
 .hero-title {
   font-size: clamp(38px, 5.2vw, 62px); font-weight: 800; letter-spacing: -0.04em;
   line-height: 1.02; max-width: 13ch;
@@ -221,24 +294,6 @@ ul { list-style: none; }
 .hero-meta i { color: var(--accent); font-size: 15px; }
 
 /* Intro copy — sits below the hero cube */
-.intro-copy {
-  position: relative; max-width: var(--max-w); margin: 0 auto;
-  padding: 72px 24px 80px;
-  text-align: center;
-}
-.intro-copy .hero-title {
-  max-width: 15ch; margin: 0 auto;
-}
-.intro-copy .hero-sub {
-  margin: 22px auto 0; max-width: 52ch;
-}
-.intro-copy .hero-ctas {
-  justify-content: center;
-}
-.intro-copy .hero-meta {
-  justify-content: center;
-}
-
 /* 3D cube split animation */
 .cube-stage {
   position: relative; z-index: 2;
