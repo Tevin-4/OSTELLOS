@@ -247,7 +247,8 @@ ul { list-style: none; }
 
 .hero-image-content .hero-meta {
   margin-top: 30px;
-  justify-content: center;
+  justify-content: flex-start;
+  align-items: center;
 }
 
 /* Ambient blobs */
@@ -1003,6 +1004,50 @@ ul { list-style: none; }
   .hero { padding-bottom: 48px; }
   .hero-title { font-size: clamp(32px, 8vw, 44px); }
   .hero-meta { flex-direction: column; gap: 8px; }
+
+  .hero-image-content .hero-meta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .hero-image-section {
+    min-height: 60vh;
+    padding: 32px 16px 0;
+  }
+
+  .hero-image-bg {
+    background: radial-gradient(
+      circle at center,
+      rgba(255, 255, 255, 1) 0%,
+      rgba(255, 255, 255, 0.98) 30%,
+      rgba(255, 255, 255, 0.6) 55%,
+      rgba(255, 255, 255, 0.0) 70%,
+      rgba(255, 255, 255, 0.0) 100%
+    );
+  }
+
+  .hero-image-bg picture {
+    opacity: 0.35;
+  }
+
+  .hero-image-content {
+    padding: 0 8px;
+  }
+
+  .hero-image-content .hero-title {
+    font-size: clamp(32px, 8vw, 44px);
+    color: #000;
+  }
+
+  .hero-image-content .hero-sub {
+    font-size: 16px;
+    color: #000;
+  }
+
+  .hero-image-content .hero-meta li {
+    color: #000;
+  }
 
   .bento {
     grid-template-columns: 1fr;

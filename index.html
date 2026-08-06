@@ -93,7 +93,10 @@
     <!-- ── Hero Image Section ───────────────────────────────────────────── -->
     <section class="hero-image-section">
       <div class="hero-image-bg" aria-hidden="true">
-        <img src="/hero.png" alt="Ostellos MS campus" class="hero-image-img" />
+        <picture>
+          <source media="(max-width: 768px)" srcset="/mobile.png" />
+          <img src="/hero.png" alt="Ostellos MS campus" class="hero-image-img" />
+        </picture>
       </div>
       <div class="hero-image-content">
         <h1 class="hero-title">Run every hostel operation from one dashboard</h1>
