@@ -314,13 +314,13 @@ ul {
 .hero-image-section {
   position: relative;
   width: 100%;
-  min-height: 50vh;
+  min-height: 70vh;
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
   overflow: hidden;
-  padding: 40px 24px 0;
+  padding: 40px 40px 120px;
 }
 
 .hero-image-bg {
@@ -330,9 +330,9 @@ ul {
   pointer-events: none;
   background: radial-gradient(circle at center,
       rgba(255, 255, 255, 1) 0%,
-      rgba(255, 255, 255, 0.95) 25%,
-      rgba(255, 255, 255, 0.4) 55%,
-      rgba(255, 255, 255, 0.0) 75%,
+      rgba(255, 255, 255, 0.95) 30%,
+      rgba(255, 255, 255, 0.4) 60%,
+      rgba(255, 255, 255, 0.0) 80%,
       rgba(255, 255, 255, 0.0) 100%);
 }
 
@@ -348,7 +348,7 @@ ul {
   position: relative;
   z-index: 2;
   max-width: 800px;
-  padding: 0 24px;
+  padding: 0 40px;
 }
 
 .hero-image-content .hero-title {
@@ -1730,28 +1730,8 @@ ul {
     gap: 8px;
   }
 
-  .hero-image-section {
-    min-height: 90vh;
-    padding: 24px 16px 0;
-  }
-
-  .hero-image-bg {
-    background: radial-gradient(
-      circle at center,
-      rgba(255, 255, 255, 0.9) 0%,
-      rgba(255, 255, 255, 0.75) 30%,
-      rgba(255, 255, 255, 0.2) 55%,
-      rgba(255, 255, 255, 0.0) 75%,
-      rgba(255, 255, 255, 0.0) 100%
-    );
-  }
-
-  .hero-image-bg picture {
-    opacity: 0.55;
-  }
-
   .hero-image-content {
-    padding: 0 8px;
+    padding: 0 24px;
   }
 
   .hero-image-content .hero-title {
@@ -1762,6 +1742,11 @@ ul {
   .hero-image-content .hero-sub {
     font-size: 16px;
     color: #000;
+  }
+
+  .hero-image-section {
+    min-height: 70vh;
+    padding: 40px 24px 100px;
   }
 
   .bento {
