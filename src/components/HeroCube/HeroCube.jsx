@@ -1,5 +1,5 @@
 /* ─── HeroCube.jsx ────────────────────────────── */
-import { useRef, useMemo, useState, useEffect, useCallback } from 'react';
+import { useRef, useMemo, useState, useEffect, useCallback, memo } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Float } from '@react-three/drei';
 import { EffectComposer, Bloom } from '@react-three/postprocessing';
@@ -47,7 +47,7 @@ const ANIMATION_CONFIG = {
   colors: { light: 0x2ec4b6, dark: 0xffffff, wireframe: 0x0891b2 },
 };
 
-function ConnectLines({ animRef }) {
+const ConnectLines = memo(function ConnectLines({ animRef }) {
   const matRef = useRef();
   const geo = useMemo(
     () =>
@@ -67,9 +67,9 @@ function ConnectLines({ animRef }) {
       <lineBasicMaterial ref={matRef} color="#94a3b8" transparent opacity={0} />
     </line>
   );
-}
+});
 
-function WireframePulse({ animRef }) {
+const WireframePulse = memo(function WireframePulse({ animRef }) {
   const ref = useRef();
   const totalSize = (STEP * 2 + CUBE_SIZE) * 1.06;
   useFrame(() => {
@@ -90,9 +90,9 @@ function WireframePulse({ animRef }) {
       <meshBasicMaterial color="#0891B2" wireframe transparent opacity={0} />
     </mesh>
   );
-}
+});
 
-function CentralCube({ isDark }) {
+const CentralCube = memo(function CentralCube({ isDark }) {
   const ref = useRef();
   const mat = useMemo(
     () =>
@@ -110,9 +110,9 @@ function CentralCube({ isDark }) {
       <boxGeometry args={[CUBE_SIZE, CUBE_SIZE, CUBE_SIZE]} />
     </mesh>
   );
-}
+});
 
-function SolidShell({ animRef }) {
+const SolidShell = memo(function SolidShell({ animRef }) {
   const ref = useRef();
   const shellSize = CUBE_SIZE * 2 * 1.02;
   const isDark = useTheme();
@@ -144,9 +144,9 @@ function SolidShell({ animRef }) {
       <boxGeometry args={[shellSize, shellSize, shellSize]} />
     </mesh>
   );
-}
+});
 
-function TypewriterText({ text, trigger, speed = 60 }) {
+const TypewriterText = memo(function TypewriterText({ text, trigger, speed = 60 }) {
   const [displayed, setDisplayed] = useState('');
   const [typing, setTyping] = useState(false);
   const indexRef = useRef(0);
@@ -175,7 +175,7 @@ function TypewriterText({ text, trigger, speed = 60 }) {
   }, [typing, displayed, text, speed]);
 
   return <span>{displayed}{typing && <span className="typewriter-cursor">|</span>}</span>;
-}
+});
 
 function useAnimationMachine() {
   const animRef = useRef({ phase: 'idle', highlightIndex: -1, groupY: 0, showLeft: true, showRight: false });
@@ -227,7 +227,7 @@ function useAnimationMachine() {
   return animRef;
 }
 
-function Scene({ onAnimUpdate, onAnimationChange, onUserHover }) {
+const Scene = memo(function Scene({ onAnimUpdate, onAnimationChange, onUserHover }) {
   const groupRef = useRef();
   const { camera } = useThree();
   const animRef = useAnimationMachine();
@@ -301,7 +301,7 @@ function Scene({ onAnimUpdate, onAnimationChange, onUserHover }) {
       )}
     </>
   );
-}
+});
 
 export default function HeroCube() {
   const [animState, setAnimState] = useState({ showLeft: true, showRight: false });

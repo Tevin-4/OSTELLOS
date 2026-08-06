@@ -1,11 +1,10 @@
-import { useRef, useMemo, useState, useEffect } from 'react';
+import { useRef, useMemo, useState, useEffect, memo } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 import { useTheme } from '../../ThemeProvider.jsx';
 import { CUBE_SIZE } from './FeatureConfig';
-import './FeatureCube.css';
 
-function FeatureCube({ index, restPos, splitPos, accent, title, icon, animRef, onAnimationChange, onUserHover }) {
+const FeatureCube = memo(function FeatureCube({ index, restPos, splitPos, accent, title, icon, animRef, onAnimationChange, onUserHover }) {
   const meshRef = useRef();
   const glowRef = useRef();
   const [hovered, setHovered] = useState(false);
@@ -126,6 +125,6 @@ function FeatureCube({ index, restPos, splitPos, accent, title, icon, animRef, o
       </mesh>
     </group>
   );
-}
+});
 
 export default FeatureCube;
