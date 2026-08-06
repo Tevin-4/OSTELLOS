@@ -1731,23 +1731,23 @@ ul {
   }
 
   .hero-image-section {
-    min-height: 80vh;
-    padding: 32px 16px 0;
+    min-height: 90vh;
+    padding: 24px 16px 0;
   }
 
   .hero-image-bg {
     background: radial-gradient(
       circle at center,
-      rgba(255, 255, 255, 1) 0%,
-      rgba(255, 255, 255, 0.95) 35%,
-      rgba(255, 255, 255, 0.5) 60%,
-      rgba(255, 255, 255, 0.0) 80%,
+      rgba(255, 255, 255, 0.9) 0%,
+      rgba(255, 255, 255, 0.75) 30%,
+      rgba(255, 255, 255, 0.2) 55%,
+      rgba(255, 255, 255, 0.0) 75%,
       rgba(255, 255, 255, 0.0) 100%
     );
   }
 
   .hero-image-bg picture {
-    opacity: 0.85;
+    opacity: 0.55;
   }
 
   .hero-image-content {
