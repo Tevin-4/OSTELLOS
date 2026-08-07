@@ -15,10 +15,10 @@ const FeatureCube = memo(function FeatureCube({ index, restPos, splitPos, accent
     () => {
       const material = new THREE.MeshStandardMaterial({
         color: new THREE.Color(isDark ? 0xffffff : 0x2ec4b6),
-        metalness: 0.05,
-        roughness: 0.32,
-        emissive: new THREE.Color(0x000000),
-        emissiveIntensity: 0,
+        metalness: isDark ? 0.0 : 0.05,
+        roughness: isDark ? 0.15 : 0.32,
+        emissive: new THREE.Color(isDark ? 0xffffff : 0x000000),
+        emissiveIntensity: isDark ? 0.15 : 0,
         transparent: true,
         opacity: 1,
       });

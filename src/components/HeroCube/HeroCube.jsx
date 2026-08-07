@@ -120,11 +120,11 @@ const SolidShell = memo(function SolidShell({ animRef }) {
   const mat = useMemo(
     () =>
       new THREE.MeshStandardMaterial({
-        color: new THREE.Color(isDark ? 0xffffff : 0xff0000),
-        metalness: 0.05,
-        roughness: 0.32,
-        emissive: new THREE.Color(0x000000),
-        emissiveIntensity: 0,
+        color: new THREE.Color(isDark ? 0xffffff : 0x2ec4b6),
+        metalness: isDark ? 0.0 : 0.05,
+        roughness: isDark ? 0.15 : 0.32,
+        emissive: new THREE.Color(isDark ? 0xffffff : 0x000000),
+        emissiveIntensity: isDark ? 0.15 : 0,
       }),
     [isDark]
   );
@@ -136,7 +136,8 @@ const SolidShell = memo(function SolidShell({ animRef }) {
     const targetScale = assembled ? 1 : 0;
     const s = ref.current.scale.x;
     ref.current.scale.setScalar(s + (targetScale - s) * 0.15);
-    mat.color.setHex(isDark ? 0xffffff : 0xff0000);
+    mat.color.setHex(isDark ? 0xffffff : 0x2ec4b6);
+    mat.emissiveIntensity = isDark ? 0.15 : 0;
   });
 
   return (

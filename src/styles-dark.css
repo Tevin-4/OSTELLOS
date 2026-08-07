@@ -528,6 +528,27 @@
   background: radial-gradient(circle, rgba(46, 196, 182, 0.08), transparent 70%);
 }
 
+/* ── Hero image section (dark mode) ─────────── */
+[data-theme="dark"] .hero-image-img {
+  filter: brightness(0.15) saturate(0.4);
+}
+[data-theme="dark"] .hero-image-bg {
+  background: rgba(11, 17, 32, 0.9);
+}
+[data-theme="dark"] .hero-image-section {
+  background: var(--bg);
+}
+[data-theme="dark"] .hero-image-content .hero-title {
+  color: var(--text);
+}
+[data-theme="dark"] .hero-image-content .hero-sub {
+  color: var(--text-2);
+}
+[data-theme="dark"] .hero-image-content .hero-ctas .btn-ghost {
+  color: var(--text);
+  border-color: var(--border);
+}
+
 /* ── Mobile nav dark ──────────────────────────── */
 [data-theme="dark"] .nav.open .nav-links {
   background: rgba(11, 17, 32, 0.98);
